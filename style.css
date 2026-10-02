@@ -971,6 +971,59 @@ svg {
 }
 
 /* =========================================================
+   PATCH 0.4 — мультивыбор локаций
+========================================================= */
+
+.selected-locations-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.location-card:not(.is-selected)::after {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 18px;
+  height: 18px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  background: rgba(114, 246, 174, 0.06);
+  content: "";
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.82);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.location-card:not(.is-selected):hover::after,
+.location-card:not(.is-selected):focus-visible::after {
+  opacity: 0.68;
+  transform: scale(1);
+}
+
+.location-card.is-selected .location-card__check {
+  z-index: 1;
+}
+
+/* =========================================================
    АУДИТ ЭНТРОПИИ
 ========================================================= */
 
@@ -2816,4 +2869,4 @@ svg {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-}
+  }
