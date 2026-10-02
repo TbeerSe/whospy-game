@@ -66,7 +66,7 @@
           </h2>
 
           <p class="screen-description">
-            Добавьте участников, выберите локацию и настройте правила
+            Добавьте участников, выберите локации и настройте правила
             секретной операции.
           </p>
         </div>
@@ -211,20 +211,17 @@
                   Количество шпионов
                 </label>
 
+                <!-- PATCH 0.4 — новые вероятностные режимы -->
                 <select
                   id="spies-count"
                   name="spiesCount"
                   class="select-input"
                 >
-                  <option value="random" selected>
-                    Случайно — 1–25% игроков
-                  </option>
-                  <option value="1">1 шпион</option>
-                  <option value="2">2 шпиона</option>
-                  <option value="3">3 шпиона</option>
-                  <option value="4">4 шпиона</option>
-                  <option value="5">5 шпионов</option>
-                  <option value="all">Все игроки шпионы (Паранойя)</option>
+                  <option value="1">Ровно 1 шпион</option>
+                  <option value="p25" selected>Случайно — 1–25% игроков</option>
+                  <option value="p50">Случайно — 1–50% игроков</option>
+                  <option value="p75">Случайно — 1–75% игроков</option>
+                  <option value="p100">Случайно — 1–100% (полный хаос)</option>
                 </select>
 
                 <p class="field-hint">
@@ -239,7 +236,7 @@
             <div class="panel__header">
               <div>
                 <p class="panel__eyebrow">РАЗВЕДДАННЫЕ</p>
-                <h3 class="panel__title">Пак локаций</h3>
+                <h3 class="panel__title">Пул локаций</h3>
               </div>
 
               <button
@@ -296,7 +293,7 @@
             </div>
 
             <p class="field-hint" id="location-hint">
-              Выберите одну локацию для текущей операции.
+              Выберите хотя бы одну локацию для операции.
             </p>
           </article>
         </div>
@@ -775,4 +772,4 @@
   <!-- JavaScript приложения -->
   <script type="module" src="app.js"></script>
 </body>
-</html>
+  </html>
