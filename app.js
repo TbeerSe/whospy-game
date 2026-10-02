@@ -27,6 +27,10 @@ const DEBTOR_TAX = 0.25;
 const CRISIS_CHANCE = 0.15;
 const HUNT_STEAL = 50;
 
+// PATCH 0.4 — отдельная константа для сида выбора локации из пула,
+// чтобы этот выбор не «съедал» первые броски у shuffle игроков.
+const LOCATION_SEED_CONSTANT = 0x10CA7105;
+
 const RANDOM_EVENTS = {
   crisis: {
     title: "ЭКОНОМИЧЕСКИЙ КРИЗИС",
@@ -192,11 +196,18 @@ const state = {
   players: [],
   customLocations: [],
   selectedPack: "default",
-  selectedLocation: null,
+
+  // PATCH 0.4 — вместо одной локации храним пул выбранных.
+  selectedLocations: [],
+
+  // PATCH 0.4 — реальная локация текущего раунда (выбирается TRNG).
+  currentRoundLocation: null,
 
   durationMinutes: 10,
   roleMode: "classic",
-  spiesSetting: "random",
+
+  // PATCH 0.4 — новый формат настройки количества шпионов.
+  spiesSetting: "p25",
 
   assignments: [],
   currentPlayerIndex: 0,
@@ -1212,14 +1223,11 @@ function renderLocationCards(container, locations) {
     card.className = "location-card";
     card.dataset.locationIndex = String(index);
 
-    const isCustomContainer =
-      container === elements.customLocations;
-
-    const isSelected =
-      state.selectedLocation &&
-      state.selectedLocation.name === location.name &&
-      state.selectedPack ===
-        (isCustomContainer ? "custom" : "default");
+    // PATCH 0.4 — проверяем принадлежность к пулу выбранных локаций
+    // по имени (пул может содержать локации из разных паков).
+    const isSelected = state.selectedLocations.some(
+      (item) => item.name === location.name
+    );
 
     card.classList.toggle("is-selected", Boolean(isSelected));
 
@@ -1245,17 +1253,40 @@ function renderLocationCards(container, locations) {
   });
 }
 
-function selectLocation(index) {
+// PATCH 0.4 — хинт под пулом локаций.
+function updateLocationHint() {
+  if (!elements.locationHint) return;
+
+  const count = state.selectedLocations.length;
+
+  if (count === 0) {
+    elements.locationHint.textContent =
+      "Выберите хотя бы одну локацию для операции.";
+  } else {
+    elements.locationHint.textContent =
+      `Выбрано локаций: ${count}. Игра случайно выберет одну из них.`;
+  }
+}
+
+// PATCH 0.4 — toggleLocation вместо selectLocation: клик по карточке
+// добавляет/удаляет локацию из пула.
+function toggleLocation(index) {
   const locations = getCurrentLocations();
-  const selected = locations[index];
+  const location = locations[index];
 
-  if (!selected) return;
+  if (!location) return;
 
-  state.selectedLocation = selected;
+  const existingIndex = state.selectedLocations.findIndex(
+    (item) => item.name === location.name
+  );
 
-  elements.locationHint.textContent =
-    `Выбрана локация: ${selected.name}`;
+  if (existingIndex >= 0) {
+    state.selectedLocations.splice(existingIndex, 1);
+  } else {
+    state.selectedLocations.push(location);
+  }
 
+  updateLocationHint();
   renderDefaultLocations();
   renderCustomLocations();
 }
@@ -1263,6 +1294,27 @@ function selectLocation(index) {
 /* =========================================================
    НАСТРОЙКИ
 ========================================================= */
+
+// PATCH 0.4 — миграция старых значений настройки количества шпионов
+// на новый формат (1, p25, p50, p75, p100).
+function migrateSpiesSetting(rawValue) {
+  if (rawValue === undefined || rawValue === null) {
+    return "p25";
+  }
+
+  const value = String(rawValue);
+
+  if (value === "random") return "p25";
+  if (value === "all") return "p100";
+  if (["2", "3", "4", "5"].includes(value)) return "1";
+
+  if (["1", "p25", "p50", "p75", "p100"].includes(value)) {
+    return value;
+  }
+
+  // Неизвестное значение — безопасный откат.
+  return "p25";
+}
 
 function loadSettings() {
   const savedSettings = readFromStorage(
@@ -1288,8 +1340,13 @@ function loadSettings() {
     });
   }
 
-  if (savedSettings.spiesSetting) {
-    state.spiesSetting = savedSettings.spiesSetting;
+  // PATCH 0.4 — всегда прогоняем через миграцию, чтобы старые
+  // сохранённые значения не сломали игру.
+  state.spiesSetting = migrateSpiesSetting(
+    savedSettings.spiesSetting
+  );
+
+  if (elements.spiesCount) {
     elements.spiesCount.value = state.spiesSetting;
   }
 
@@ -1305,9 +1362,6 @@ function saveSettings() {
 }
 
 function ensureSpiesVisibility() {
-  // Секция «Количество шпионов» сейчас всегда видима:
-  // настройка релевантна и для classic, и для accomplice.
-  // Функция сохранена как точка расширения для будущей логики.
   if (elements.spiesSettings) {
     elements.spiesSettings.hidden = false;
   }
@@ -1321,7 +1375,16 @@ function readSettingsFromForm() {
       'input[name="role-mode"]:checked'
     )?.value || "classic";
 
-  state.spiesSetting = elements.spiesCount.value;
+  // PATCH 0.4 — берём новое значение, прогоняем через миграцию
+  // (на случай, если в HTML случайно остался старый option).
+  state.spiesSetting = migrateSpiesSetting(
+    elements.spiesCount.value
+  );
+
+  // Синхронизируем select с актуальным значением.
+  if (elements.spiesCount.value !== state.spiesSetting) {
+    elements.spiesCount.value = state.spiesSetting;
+  }
 
   saveSettings();
 }
@@ -1578,43 +1641,63 @@ async function runEntropyAudit() {
    РАСПРЕДЕЛЕНИЕ РОЛЕЙ
 ========================================================= */
 
+// PATCH 0.4 — новые значения настройки: 1, p25, p50, p75, p100.
+// Любое неизвестное значение откатывается к p25.
 function getSpiesCount(playerCount, setting, random) {
-  const maximumAllowed = Math.max(
-    1,
-    Math.floor(playerCount * 0.25)
-  );
+  const total = Math.max(1, playerCount);
 
-  if (setting === "all") {
-    return playerCount;
+  if (setting === "1") {
+    return 1;
   }
 
-  if (setting === "random") {
-    return 1 + Math.floor(random() * maximumAllowed);
+  if (setting === "p100") {
+    // PATCH 0.4.1 — p100 означает «случайно от 1 до N шпионов»,
+    // а не «все шпионы». Возвращаем равномерный диапазон [1..N].
+    return 1 + Math.floor(random() * total);
   }
 
-  const requested = Number(setting);
+  let ratio;
 
-  return Math.min(
-    Math.max(1, requested || 1),
-    maximumAllowed,
-    playerCount - 1
-  );
+  if (setting === "p50") {
+    ratio = 0.5;
+  } else if (setting === "p75") {
+    ratio = 0.75;
+  } else {
+    // "p25" + безопасный откат для неизвестных значений.
+    ratio = 0.25;
+  }
+
+  const maximum = Math.max(1, Math.floor(total * ratio));
+
+  return 1 + Math.floor(random() * maximum);
 }
 
 function createAssignments(entropy) {
   const random = createRandomGenerator(entropy.seed);
   const players = shuffleArray(state.players, random);
-  const location = state.selectedLocation;
+
+  // PATCH 0.4 — выбор локации из пула отдельным TRNG, чтобы
+  // этот выбор не «съедал» первые броски у shuffle игроков
+  // (и был детерминирован тем же сидом игры).
+  const locationRandom = createRandomGenerator(
+    (entropy.seed ^ LOCATION_SEED_CONSTANT) >>> 0
+  );
+
+  const pool = state.selectedLocations.length
+    ? state.selectedLocations
+    : getCurrentLocations();
+
+  const location =
+    pool[Math.floor(locationRandom() * pool.length)] || pool[0];
+
+  // PATCH 0.4 — сохраняем реальную локацию раунда для перехвата.
+  state.currentRoundLocation = location.name;
+
   const roles = shuffleArray(location.roles, random);
 
-  if (state.spiesSetting === "all") {
-    return players.map((player) => ({
-      player,
-      roleType: "spy",
-      role: null,
-      location: location.name
-    }));
-  }
+  // PATCH 0.4.1 — убран преждевременный return для p100.
+  // Теперь p100 идёт по общему пути и вызывает getSpiesCount(),
+  // который вернёт случайное число шпионов в диапазоне [1..N].
 
   const spiesCount = getSpiesCount(
     players.length,
@@ -1799,13 +1882,16 @@ function renderCurrentPlayer() {
 }
 
 function getRadarLocations(realLocation, level, random = Math.random) {
-  const locations = getCurrentLocations().map(
-    (location) => location.name
-  );
+  // PATCH 0.4 — радар сужает именно пул выбранных локаций.
+  const source = state.selectedLocations.length
+    ? state.selectedLocations
+    : getCurrentLocations();
+
+  const locations = source.map((location) => location.name);
 
   const total = locations.length;
 
-  // BUG 4 (0.3.1): защита от пака из одной локации — радар не должен
+  // BUG 4 (0.3.1): защита от пула из одной локации — радар не должен
   // давать шпиону мгновенную подсказку.
   if (total < 2) {
     return [realLocation];
@@ -1815,9 +1901,6 @@ function getRadarLocations(realLocation, level, random = Math.random) {
 
   // BUG 2 (0.3.2): Math.round вместо Math.ceil, чтобы уровень 2
   // действительно сужал список сильнее уровня 1 даже на 6 локациях.
-  //  5 локаций: lvl1 = 3, lvl2 = 2
-  //  6 локаций: lvl1 = 3, lvl2 = 2 (было 3/3 из-за ceil)
-  // 10 локаций: lvl1 = 5, lvl2 = 4
   const count = Math.max(
     2,
     Math.min(total, Math.round(total * ratio))
@@ -1887,8 +1970,6 @@ function revealCurrentRole() {
 
     if (radarLevel) {
       // BUG 3 (0.3.1): используем TRNG вместо Math.random.
-      // Персональный сид = seed игры XOR hash(имя игрока),
-      // чтобы разные шпионы не получали одинаковый список.
       const radarRandom = createRandomGenerator(
         (state.entropySeed ^ stringToSeed(assignment.player)) >>> 0
       );
@@ -2218,7 +2299,11 @@ function renderJudgingInterface() {
       .join("");
   }
 
-  const locations = getCurrentLocations();
+  // PATCH 0.4 — перехват показывает пул выбранных локаций,
+  // а не весь пак: шпион угадывает из того же набора.
+  const locations = state.selectedLocations.length
+    ? state.selectedLocations
+    : getCurrentLocations();
 
   locationList.innerHTML = locations
     .map(
@@ -2341,7 +2426,6 @@ function updateVoterButtons() {
   }
 }
 
-// BUG 6 (0.3.1): единый хелпер сброса состояния голосования.
 function resetVotingState() {
   state.voting.suspect = null;
   state.voting.initiator = null;
@@ -2353,7 +2437,6 @@ function resetVotingState() {
     voterPanel.hidden = true;
   }
 
-  // BUG 5 (0.3.1): снимаем подсветку со всех кнопок голосования.
   document
     .querySelectorAll(
       "[data-suspect], [data-voter], [data-initiator]"
@@ -2365,7 +2448,6 @@ function resetVotingState() {
   const voteStatus = $("#vote-status");
 
   if (voteStatus) {
-    // BUG 3 (0.3.2): при сбросе всегда возвращаем нейтральный класс.
     voteStatus.className = "judging-status";
     voteStatus.textContent = "";
   }
@@ -2422,9 +2504,6 @@ function handleJudgingClick(event) {
     } else {
       state.voting.voters.add(voter);
     }
-
-    // BUG 7 (0.3.1): инициатор теперь назначается только явным выбором,
-    // никакого «молчаливого» назначения первого голосующего.
 
     updateVoterButtons();
     return;
@@ -2499,7 +2578,6 @@ function submitVote() {
     playFailure();
 
     if (voteStatus) {
-      // BUG 3 (0.3.2): явный класс ошибки.
       voteStatus.className =
         "judging-status judging-status--error";
       voteStatus.textContent =
@@ -2509,7 +2587,6 @@ function submitVote() {
     return;
   }
 
-  // BUG 7 (0.3.1): обязательное явное указание инициатора.
   if (!initiator) {
     playFailure();
 
@@ -2557,7 +2634,6 @@ function submitVote() {
         "Фальшивое удостоверение спасло подозреваемого"
       );
 
-      // BUG 5 + BUG 6 (0.3.1): полный сброс через хелпер.
       resetVotingState();
 
       if (voteStatus) {
@@ -2586,7 +2662,6 @@ function submitVote() {
     resetVotingState();
 
     if (voteStatus) {
-      // Это тоже ошибка выбора — подсвечиваем красным.
       voteStatus.className =
         "judging-status judging-status--error";
       voteStatus.textContent =
@@ -2815,9 +2890,7 @@ function awardVotingVictory(suspect) {
     }
   });
 
-  // Событие «Охота за головами»: кража идёт НАПРЯМУЮ через changeBalance
-  // (по ТЗ — «украдёт напрямую из баланса шпиона»), поэтому кризис
-  // её не удваивает. Это осознанное поведение.
+  // Событие «Охота за головами»: кража идёт НАПРЯМУЮ через changeBalance.
   if (
     state.activeEvent === "hunt" &&
     initiator &&
@@ -2922,7 +2995,9 @@ function finishBySpyLocation(spy, guessedLocation) {
 
   stopGameTimer();
 
-  const realLocation = state.selectedLocation.name;
+  // PATCH 0.4 — правильный ответ берём из поля текущего раунда
+  // (его выставляет createAssignments через TRNG).
+  const realLocation = state.currentRoundLocation;
   const isCorrect = guessedLocation === realLocation;
 
   state.gameOutcome = isCorrect
@@ -3000,7 +3075,18 @@ async function revealAllRolesAtEnd(outcome = "timeout") {
 
   const resultText = getResultText(outcome);
 
-  if (state.spiesSetting === "all") {
+  // PATCH 0.4.1 — «Паранойя» показывается только тогда, когда
+  // шпионами реально стали ВСЕ игроки (независимо от настройки).
+  // p100 теперь не гарантирует, что шпионов будет много.
+  const totalPlayers = state.assignments.length;
+  const totalSpies = state.assignments.filter(
+    (assignment) => assignment.roleType === "spy"
+  ).length;
+
+  const isRealParanoia =
+    totalPlayers > 0 && totalSpies === totalPlayers;
+
+  if (isRealParanoia) {
     resultTitle.textContent = "🚨 РЕЖИМ «ПАРАНОЙЯ»";
     resultDesc.textContent =
       "Абсолютный хаос! В этой операции не было мирных жителей.";
@@ -3038,8 +3124,6 @@ async function revealAllRolesAtEnd(outcome = "timeout") {
 
     card.className = "end-role-badge";
 
-    // BUG 4 (0.3.2): прокидываем индекс в CSS-переменную,
-    // чтобы заработал каскадный animation-delay.
     card.style.setProperty("--badge-index", String(index));
 
     if (assignment.roleType === "spy") {
@@ -3088,9 +3172,6 @@ async function revealAllRolesAtEnd(outcome = "timeout") {
    ПЕРЕХВАТ ЛОКАЦИИ ШПИОНОМ
 ========================================================= */
 
-// BUG 10 (0.3.1): вместо window.confirm — нативный <dialog>.
-// BUG 1 (0.3.2): класс сообщения приведён в соответствие с CSS
-// (.confirm-intercept-modal__description вместо ...__message).
 function createInterceptConfirmModal() {
   let modal = $("#confirm-intercept-modal");
 
@@ -3167,9 +3248,9 @@ function executeIntercept(locationName) {
     return;
   }
 
-  // В режиме «Паранойя» (spiesSetting === "all") шпионов много,
-  // но перехват — одноразовое действие. Вызываем finishBySpyLocation
-  // ровно один раз, а не N раз в цикле.
+  // PATCH 0.4.1 — если шпионов несколько (в т.ч. при p100),
+  // перехват всё равно одноразовый — вызываем finishBySpyLocation
+  // ровно один раз.
   finishBySpyLocation(spies[0].player, locationName);
 }
 
@@ -3191,7 +3272,6 @@ function interceptLocation(locationName) {
 
   modal.dataset.location = locationName;
 
-  // BUG 1 (0.3.2): используем класс __description, совпадающий с CSS.
   const messageEl = modal.querySelector(
     ".confirm-intercept-modal__description"
   );
@@ -3231,6 +3311,9 @@ function resetGame() {
   state.pendingEvent = null;
   state.activeEvent = null;
   state.bonusRadar = null;
+
+  // PATCH 0.4 — сбрасываем правильный ответ текущего раунда.
+  state.currentRoundLocation = null;
 
   state.voting.suspect = null;
   state.voting.initiator = null;
@@ -3338,7 +3421,15 @@ function setupSettingsHandlers() {
   elements.spiesCount.addEventListener(
     "change",
     () => {
-      state.spiesSetting = elements.spiesCount.value;
+      // PATCH 0.4 — мигрируем на случай старого значения из HTML.
+      state.spiesSetting = migrateSpiesSetting(
+        elements.spiesCount.value
+      );
+
+      if (elements.spiesCount.value !== state.spiesSetting) {
+        elements.spiesCount.value = state.spiesSetting;
+      }
+
       saveSettings();
     }
   );
@@ -3372,22 +3463,8 @@ function setupSettingsHandlers() {
           pack !== "custom"
         );
 
-        const locations = getCurrentLocations();
-
-        if (
-          state.selectedLocation &&
-          !locations.some(
-            (location) =>
-              location.name ===
-              state.selectedLocation.name
-          )
-        ) {
-          state.selectedLocation = null;
-
-          elements.locationHint.textContent =
-            "Выберите одну локацию для текущей операции.";
-        }
-
+        // PATCH 0.4 — при переключении вкладок НЕ сбрасываем
+        // выбранные локации: пул может содержать локации из обоих паков.
         renderDefaultLocations();
         renderCustomLocations();
       }
@@ -3405,7 +3482,8 @@ function setupSettingsHandlers() {
 
       state.selectedPack = "default";
 
-      selectLocation(
+      // PATCH 0.4 — toggleLocation вместо selectLocation.
+      toggleLocation(
         Number(card.dataset.locationIndex)
       );
     }
@@ -3422,7 +3500,8 @@ function setupSettingsHandlers() {
 
       state.selectedPack = "custom";
 
-      selectLocation(
+      // PATCH 0.4 — toggleLocation вместо selectLocation.
+      toggleLocation(
         Number(card.dataset.locationIndex)
       );
     }
@@ -3444,8 +3523,6 @@ function setupSettingsHandlers() {
   );
 }
 
-// BUG 11 (0.3.1): глобальное отслеживание указателя с throttle 50 мс,
-// чтобы энтропия координат не «застывала» между раундами.
 function setupPointerEntropyTracking() {
   let lastUpdate = 0;
 
@@ -3478,9 +3555,10 @@ async function startMission() {
     return;
   }
 
-  if (!state.selectedLocation) {
+  // PATCH 0.4 — валидация пула локаций вместо одиночного выбора.
+  if (!state.selectedLocations.length) {
     elements.settingsValidation.textContent =
-      "Выберите локацию для операции.";
+      "Выберите хотя бы одну локацию для операции.";
 
     playFailure();
     return;
@@ -3722,20 +3800,21 @@ function setupCustomPackHandlers() {
 
       state.customLocations.splice(index, 1);
 
+      // PATCH 0.4 — если удаляемая локация была в пуле выбранных,
+      // убираем её оттуда и перерисовываем хинт.
+      if (deletedLocation) {
+        const poolIndex = state.selectedLocations.findIndex(
+          (item) => item.name === deletedLocation.name
+        );
+
+        if (poolIndex >= 0) {
+          state.selectedLocations.splice(poolIndex, 1);
+        }
+      }
+
       saveCustomLocations();
       renderCustomLocations();
-
-      if (
-        state.selectedLocation &&
-        deletedLocation &&
-        state.selectedLocation.name ===
-          deletedLocation.name
-      ) {
-        state.selectedLocation = null;
-
-        elements.locationHint.textContent =
-          "Выберите одну локацию для текущей операции.";
-      }
+      updateLocationHint();
 
       showToast("Локация удалена");
     }
@@ -3753,6 +3832,9 @@ function init() {
 
   renderDefaultLocations();
   renderCustomLocations();
+
+  // PATCH 0.4 — актуализируем текст хинта выбора локаций.
+  updateLocationHint();
 
   setupPlayerHandlers();
   setupSettingsHandlers();
