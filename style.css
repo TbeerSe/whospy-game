@@ -14,7 +14,7 @@
 
   --color-text: #edf9f1;
   --color-text-muted: #8da49a;
-  --color-text-dim: #5f756c;
+  --color-text-dim: #6f8880;
 
   --color-primary: #72f6ae;
   --color-primary-soft: rgba(114, 246, 174, 0.14);
@@ -164,6 +164,27 @@ svg {
   outline-offset: 3px;
 }
 
+/* Fallback-обводка через box-shadow на интерактивных элементах,
+   у которых родитель может обрезать outline (overflow: hidden). */
+.button:focus-visible,
+.player-name-button:focus-visible,
+.player-item__remove:focus-visible,
+.location-tab:focus-visible,
+.location-card:focus-visible,
+.radio-card:focus-visible,
+.icon-button:focus-visible,
+.modal-close:focus-visible,
+.custom-pack-item__delete:focus-visible,
+.judging-player-button:focus-visible,
+.judging-location-button:focus-visible,
+.judging-accordion summary:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 2px var(--color-primary-soft),
+    0 0 14px rgba(114, 246, 174, 0.28);
+}
+
 /* =========================================================
    ФОНОВЫЕ ЭФФЕКТЫ
 ========================================================= */
@@ -227,6 +248,7 @@ svg {
   min-height: 100vh;
   margin: 0 auto;
   padding: 20px 0 36px;
+  overflow-x: hidden;
 }
 
 .app-header {
@@ -428,6 +450,7 @@ svg {
 .player-item__identity {
   display: flex;
   min-width: 0;
+  flex: 1;
   align-items: center;
   gap: 10px;
 }
@@ -445,15 +468,6 @@ svg {
 
   font-family: var(--font-mono);
   font-size: 10px;
-}
-
-.player-item__name {
-  overflow: hidden;
-  color: var(--color-text);
-  font-size: 14px;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .player-item__remove {
@@ -804,6 +818,19 @@ svg {
   font-size: 24px;
 }
 
+.button.is-success {
+  color: #04120b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.button.is-failure {
+  color: #ffd9dc;
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
 .settings-actions {
   display: grid;
   gap: 12px;
@@ -1056,6 +1083,12 @@ svg {
   color: var(--color-orange);
 }
 
+.audit-log__line--danger {
+  color: var(--color-danger);
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 95, 109, 0.25);
+}
+
 .audit-progress {
   height: 5px;
   margin-top: 22px;
@@ -1166,6 +1199,7 @@ svg {
 .role-card {
   min-height: 340px;
   padding: 24px 20px;
+  overflow: hidden;
   border-color: rgba(255, 154, 74, 0.36);
   background:
     linear-gradient(
@@ -1343,7 +1377,7 @@ svg {
 
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: clamp(62px, 20vw, 150px);
+  font-size: clamp(54px, 20vw, 150px);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.08em;
@@ -1404,6 +1438,7 @@ svg {
   border-color: rgba(255, 154, 74, 0.35);
   background: var(--color-orange-soft);
   text-align: center;
+  animation: result-enter 420ms ease both;
 }
 
 .game-result__icon {
@@ -1427,9 +1462,41 @@ svg {
 }
 
 .game-result__description {
-  margin-top: 7px;
+  max-width: 560px;
+  margin: 7px auto 0;
   color: var(--color-text-muted);
   font-size: 13px;
+}
+
+/* Консистентные модификаторы результата — совпадают с .end-role-badge--* */
+.game-result.game-result--spy {
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+}
+
+.game-result.game-result--spy .game-result__icon {
+  color: #2a0407;
+  background: var(--color-danger);
+}
+
+.game-result.game-result--spy .game-result__title {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+.game-result.game-result--civilians {
+  border-color: rgba(114, 246, 174, 0.4);
+  background: var(--color-primary-soft);
+}
+
+.game-result.game-result--civilians .game-result__icon {
+  color: #04120b;
+  background: var(--color-primary);
+}
+
+.game-result.game-result--civilians .game-result__title {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(114, 246, 174, 0.3);
 }
 
 .game-controls {
@@ -1437,6 +1504,18 @@ svg {
   grid-template-columns: 1fr;
   gap: 10px;
   margin-top: 18px;
+}
+
+.game-status--ended {
+  color: var(--color-orange);
+}
+
+.game-status--spy {
+  color: var(--color-danger);
+}
+
+.game-status--civilians {
+  color: var(--color-primary);
 }
 
 /* =========================================================
@@ -1593,6 +1672,69 @@ svg {
 }
 
 /* =========================================================
+   МОДАЛКА ПОДТВЕРЖДЕНИЯ ПЕРЕХВАТА ЛОКАЦИИ
+========================================================= */
+
+.confirm-intercept-modal {
+  width: min(calc(100% - 28px), 480px);
+  max-height: min(90vh, 640px);
+  padding: 0;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 95, 109, 0.12),
+      transparent 38%
+    ),
+    var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    0 0 24px rgba(255, 95, 109, 0.14);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.confirm-intercept-modal::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.confirm-intercept-modal__content {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.confirm-intercept-modal__title {
+  max-width: calc(100% - 45px);
+  color: var(--color-text);
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+/* Алиас __message — защита от рассогласования JS/CSS.
+   Стилизуется идентично __description. */
+.confirm-intercept-modal__description,
+.confirm-intercept-modal__message {
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.confirm-intercept-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* =========================================================
    TOAST
 ========================================================= */
 
@@ -1717,6 +1859,672 @@ svg {
   }
 }
 
+@keyframes slide-up-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes radar-location-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-9px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes result-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes judging-error-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 8px rgba(255, 95, 109, 0.25);
+  }
+
+  50% {
+    opacity: 0.78;
+    text-shadow: 0 0 14px rgba(255, 95, 109, 0.45);
+  }
+}
+
+/* =========================================================
+   PATCH 0.1 — ПООЧЕРЕДНОЕ РАСКРЫТИЕ РОЛЕЙ В КОНЦЕ
+========================================================= */
+
+.end-roles-list {
+  display: grid;
+  gap: 10px;
+  max-width: 500px;
+  margin-top: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.end-role-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(141, 164, 154, 0.15);
+  border-radius: var(--radius-small);
+  animation: slide-up-reveal 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--badge-index, 0) * 60ms);
+}
+
+.end-role-badge__name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.end-role-badge__role {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+/* Консистентные модификаторы результата — совпадают с .game-result--* */
+.end-role-badge--spy {
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+}
+
+.end-role-badge--spy .end-role-badge__role {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+.end-role-badge--accomplice {
+  border-color: rgba(255, 154, 74, 0.4);
+  background: var(--color-orange-soft);
+}
+
+.end-role-badge--accomplice .end-role-badge__role {
+  color: var(--color-orange);
+  text-shadow: 0 0 10px rgba(255, 154, 74, 0.25);
+}
+
+/* =========================================================
+   PATCH 0.2 — ПРОФИЛИ ИГРОКОВ, МАГАЗИН И КОИНЫ
+========================================================= */
+
+.player-name-button {
+  display: inline-flex;
+  min-width: 0;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 4px 7px;
+  color: var(--color-text);
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: left;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.player-name-button > span {
+  line-height: 1.3;
+}
+
+.player-name-button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 14px rgba(114, 246, 174, 0.08);
+}
+
+.player-name-button:active {
+  transform: translateY(1px);
+}
+
+.player-item__balance {
+  color: var(--color-orange);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PATCH 0.3 — РАНГИ ИГРОКОВ И БЕЙДЖИ СНАРЯЖЕНИЯ
+========================================================= */
+
+.player-item__rank {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(141, 164, 154, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
+
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.player-item__rank--agent {
+  color: var(--color-text-muted);
+}
+
+.player-item__rank--elite {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 10px rgba(114, 246, 174, 0.18);
+}
+
+.player-item__rank--debtor {
+  color: var(--color-danger);
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+  text-shadow: 0 0 8px rgba(255, 95, 109, 0.35);
+}
+
+.player-item__gadgets {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: 2px;
+  color: var(--color-text-dim);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* =========================================================
+   МАГАЗИН СНАРЯЖЕНИЯ
+========================================================= */
+
+.equipment-shop-modal {
+  width: min(calc(100% - 28px), 680px);
+  max-height: min(90vh, 760px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(114, 246, 174, 0.12),
+      transparent 38%
+    ),
+    var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    var(--shadow-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.equipment-shop-modal::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.equipment-shop-modal__content {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.modal-close {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(141, 164, 154, 0.2);
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 25px;
+  line-height: 1;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.modal-close:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  transform: rotate(90deg);
+}
+
+.equipment-shop-modal__eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.equipment-shop-modal__title {
+  max-width: calc(100% - 45px);
+  color: var(--color-text);
+  font-size: clamp(25px, 6vw, 36px);
+  font-weight: 850;
+  letter-spacing: -0.04em;
+}
+
+.equipment-shop-modal__player {
+  margin-top: 8px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.equipment-shop-modal__balance {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 18px;
+  padding: 9px 13px;
+  color: var(--color-orange);
+  border: 1px solid rgba(255, 154, 74, 0.32);
+  border-radius: 999px;
+  background: var(--color-orange-soft);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.equipment-shop-modal__items {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.equipment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid rgba(114, 246, 174, 0.2);
+  border-radius: var(--radius-medium);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(114, 246, 174, 0.08),
+      rgba(255, 255, 255, 0.025)
+    );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.equipment-item__icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  place-items: center;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  box-shadow: var(--shadow-primary);
+  font-size: 25px;
+}
+
+.equipment-item__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.equipment-item__body h3 {
+  color: var(--color-text);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.equipment-item__body p {
+  margin-top: 7px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.equipment-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.equipment-item__actions .button {
+  flex: 1 1 160px;
+}
+
+.equipment-shop-modal__status {
+  margin-top: 18px;
+  padding: 11px 13px;
+  color: var(--color-text-muted);
+  border-left: 2px solid var(--color-primary);
+  background: rgba(114, 246, 174, 0.06);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.equipment-shop-modal__status--danger {
+  color: var(--color-danger);
+  border-left-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.equipment-shop-modal__status--elite {
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow:
+    inset 0 0 0 1px rgba(114, 246, 174, 0.12),
+    0 0 14px rgba(114, 246, 174, 0.08);
+  text-shadow: 0 0 8px rgba(114, 246, 174, 0.25);
+}
+
+/* =========================================================
+   РАДАР ЛОКАЦИЙ НА КАРТЕ ШПИОНА
+========================================================= */
+
+.radar-location-list {
+  display: grid;
+  gap: 7px;
+  width: min(100%, 390px);
+  margin-top: 14px;
+}
+
+.radar-location-list span {
+  display: block;
+  padding: 9px 12px;
+  color: var(--color-primary);
+  border: 1px solid rgba(114, 246, 174, 0.25);
+  border-radius: var(--radius-small);
+  background: rgba(114, 246, 174, 0.08);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  animation: radar-location-enter 320ms ease both;
+}
+
+.radar-location-list span:nth-child(2) {
+  animation-delay: 45ms;
+}
+
+.radar-location-list span:nth-child(3) {
+  animation-delay: 90ms;
+}
+
+.radar-location-list span:nth-child(4) {
+  animation-delay: 135ms;
+}
+
+.radar-location-list span:nth-child(5) {
+  animation-delay: 180ms;
+}
+
+.radar-location-list span:nth-child(6) {
+  animation-delay: 225ms;
+}
+
+/* =========================================================
+   ИНТЕРФЕЙС СУДЕЙСТВА
+========================================================= */
+
+.judging-interface {
+  display: grid;
+  gap: 11px;
+  margin-top: 16px;
+}
+
+.judging-interface[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.35);
+}
+
+.judging-accordion {
+  overflow: hidden;
+  border: 1px solid rgba(141, 164, 154, 0.19);
+  border-radius: var(--radius-medium);
+  background: rgba(13, 26, 22, 0.68);
+  box-shadow: var(--shadow-panel);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.judging-accordion[open] {
+  border-color: var(--color-border-strong);
+  background: rgba(17, 34, 28, 0.88);
+  box-shadow: 0 0 20px rgba(114, 246, 174, 0.07);
+}
+
+.judging-accordion summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  padding: 15px 17px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 750;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.judging-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Первый span (заголовок) может ужиматься, чтобы стрелка не съезжала
+   при длинном тексте, например "Модуль голосования мирных". */
+.judging-accordion summary > span:first-child {
+  min-width: 0;
+}
+
+/* Скрываем HTML-стрелку, оставляем только стилизованную через ::after */
+.judging-accordion summary > span + span {
+  display: none;
+}
+
+.judging-accordion summary::after {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  content: "⌄";
+  font-size: 17px;
+  line-height: 1;
+  transition: transform var(--transition-fast);
+}
+
+.judging-accordion[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.judging-accordion summary:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.judging-accordion__body {
+  padding: 0 17px 17px;
+  border-top: 1px solid rgba(141, 164, 154, 0.13);
+}
+
+.judging-help {
+  margin: 15px 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.judging-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.judging-player-button,
+.judging-location-button {
+  min-height: 42px;
+  padding: 9px 11px;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(141, 164, 154, 0.2);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: left;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.judging-player-button:hover,
+.judging-location-button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  transform: translateY(-1px);
+}
+
+.judging-player-button.is-selected,
+.judging-location-button.is-selected {
+  color: #04120b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.judging-player-button.is-disabled {
+  color: var(--color-text-dim);
+  border-style: dashed;
+  background: transparent;
+  text-decoration: line-through;
+}
+
+.voter-panel {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(141, 164, 154, 0.15);
+}
+
+.voter-panel h4 {
+  margin-bottom: 11px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.voter-panel .button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.judging-status {
+  min-height: 18px;
+  margin-top: 10px;
+  color: var(--color-orange);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.judging-status--error {
+  color: var(--color-danger);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 95, 109, 0.25);
+  animation: judging-error-pulse 1.6s ease-in-out infinite;
+}
+
+.judging-location-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.judging-location-button {
+  min-height: 52px;
+  color: var(--color-primary);
+  border-color: rgba(114, 246, 174, 0.24);
+  background: rgba(114, 246, 174, 0.06);
+  text-align: center;
+}
+
+.judging-empty {
+  display: block;
+  padding: 10px 12px;
+  color: var(--color-text-dim);
+  border: 1px dashed rgba(141, 164, 154, 0.2);
+  border-radius: var(--radius-small);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =========================================================
+   ДОПОЛНИТЕЛЬНЫЕ СОСТОЯНИЯ ИНТЕРФЕЙСА
+========================================================= */
+
+.is-disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
 /* =========================================================
    АДАПТИВНОСТЬ: ПЛАНШЕТЫ
 ========================================================= */
@@ -1761,6 +2569,14 @@ svg {
 
   .game-controls .button {
     min-width: 190px;
+  }
+
+  .judging-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .judging-location-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1820,8 +2636,74 @@ svg {
 }
 
 /* =========================================================
-   МОБИЛЬНЫЕ УСТРОЙСТВА
+   АДАПТИВНОСТЬ: МОБИЛЬНЫЕ
 ========================================================= */
+
+@media (max-width: 520px) {
+  .equipment-shop-modal__content {
+    padding: 22px 17px;
+  }
+
+  .equipment-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .equipment-item__icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    align-self: center;
+    margin: 0 auto;
+    font-size: 21px;
+  }
+
+  .equipment-item__body {
+    width: 100%;
+    text-align: center;
+  }
+
+  .equipment-item__body h3,
+  .equipment-item__body p {
+    text-align: center;
+  }
+
+  .equipment-item__actions {
+    display: grid;
+    width: 100%;
+  }
+
+  .equipment-item__actions .button {
+    width: 100%;
+  }
+
+  .confirm-intercept-modal__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .judging-list,
+  .judging-location-list {
+    grid-template-columns: 1fr;
+  }
+
+  .judging-accordion summary {
+    min-height: 50px;
+    padding: 13px 14px;
+    font-size: 12px;
+  }
+
+  .judging-accordion__body {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .player-name-button {
+    max-width: calc(100vw - 115px);
+  }
+}
 
 @media (max-width: 420px) {
   .app-shell {
@@ -1893,6 +2775,32 @@ svg {
   .modal__content {
     padding: 18px;
   }
+
+  .confirm-intercept-modal__content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .player-name-button {
+    gap: 3px;
+    padding-right: 3px;
+    padding-left: 3px;
+    font-size: 12px;
+  }
+
+  .player-item__balance {
+    font-size: 9px;
+  }
+
+  .player-item__rank {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+
+  .equipment-shop-modal__title {
+    font-size: 25px;
+  }
 }
 
 /* =========================================================
@@ -1907,71 +2815,5 @@ svg {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-  }
-}
-/* =========================================================
-   СТИЛИ ДЛЯ ПООЧЕРЕДНОГО РАСКРЫТИЯ РОЛЕЙ
-========================================================= */
-
-.end-roles-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 20px;
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.end-role-badge {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(141, 164, 154, 0.15);
-  border-radius: var(--radius-small);
-  
-  /* Эффект свайпа: карточка появляется из прозрачности и сдвигается вверх */
-  animation: slide-up-reveal 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.end-role-badge__name {
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.end-role-badge__role {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--color-primary);
-}
-
-/* Особый стиль для шпиона */
-.end-role-badge--spy {
-  border-color: rgba(255, 95, 109, 0.4);
-  background: rgba(255, 95, 109, 0.08);
-}
-.end-role-badge--spy .end-role-badge__role {
-  color: var(--color-danger);
-  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
-}
-
-/* Особый стиль для сообщника */
-.end-role-badge--accomplice {
-  border-color: rgba(255, 154, 74, 0.4);
-  background: rgba(255, 154, 74, 0.08);
-}
-.end-role-badge--accomplice .end-role-badge__role {
-  color: var(--color-orange);
-}
-
-@keyframes slide-up-reveal {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
