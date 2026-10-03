@@ -1,0 +1,96 @@
+/* =========================================================
+   css/features/endgame.css
+   PATCH 0.1 — поочерёдное раскрытие ролей в конце
+   PATCH 0.5 — дельта баланса
+========================================================= */
+@layer features {
+
+/* =========================================================
+   PATCH 0.1 — ПООЧЕРЕДНОЕ РАСКРЫТИЕ РОЛЕЙ В КОНЦЕ
+========================================================= */
+
+.end-roles-list {
+  display: grid;
+  gap: 10px;
+  max-width: 500px;
+  margin-top: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.end-role-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(141, 164, 154, 0.15);
+  border-radius: var(--radius-small);
+  animation: slide-up-reveal 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--badge-index, 0) * 60ms);
+}
+
+.end-role-badge__name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.end-role-badge__role {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+/* Консистентные модификаторы результата — совпадают с .game-result--* */
+.end-role-badge--spy {
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+}
+
+.end-role-badge--spy .end-role-badge__role {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+.end-role-badge--accomplice {
+  border-color: rgba(255, 154, 74, 0.4);
+  background: var(--color-orange-soft);
+}
+
+.end-role-badge--accomplice .end-role-badge__role {
+  color: var(--color-orange);
+  text-shadow: 0 0 10px rgba(255, 154, 74, 0.25);
+}
+
+/* =========================================================
+   PATCH 0.5 — ДЕЛЬТА БАЛАНСА В КОНЦЕ РАУНДА
+   JS вставляет <span class="end-role-badge__delta ...">+70 🪙</span>
+   справа от .end-role-badge__role.
+========================================================= */
+
+.end-role-badge__delta {
+  margin-left: auto;
+  padding-left: 10px;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.end-role-badge__delta--up {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(114, 246, 174, 0.3);
+}
+
+.end-role-badge__delta--down {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+.end-role-badge__delta--zero {
+  color: var(--color-text-dim);
+}
+
+} /* @layer features */

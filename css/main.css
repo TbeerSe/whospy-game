@@ -1,0 +1,47 @@
+/* =========================================================
+   css/main.css — точка входа CSS
+   Порядок @layer фиксирует каскад без !important.
+========================================================= */
+@charset "UTF-8";
+
+/* Явный порядок слоёв (сверху вниз — от низкоприоритетных
+   к высокоприоритетным). Любой стиль из нижнего слоя
+   перебивает стиль из верхнего, независимо от специфичности. */
+@layer tokens, reset, base, layout, components, features, utilities;
+
+/* ---------------------------------------------------------
+   Импорты. Порядок важен — он задаёт визуальный порядок
+   применения при равной специфичности.
+--------------------------------------------------------- */
+
+/* 1. Токены (переменные) */
+@import url("./tokens.css");
+
+/* 2. Сброс и базовая разметка */
+@import url("./reset.css");
+@import url("./base.css");
+
+/* 3. Каркас: shell, header, screens, panels */
+@import url("./layout.css");
+
+/* 4. Компоненты: кнопки, поля, модалки, toast */
+@import url("./components.css");
+
+/* 5. Фичи (порядок не критичен, но оставляем как было в style.css) */
+@import url("./features/players.css");
+@import url("./features/locations.css");
+@import url("./features/audit.css");
+@import url("./features/dealing.css");
+@import url("./features/game.css");
+@import url("./features/judging.css");
+@import url("./features/shop.css");
+@import url("./features/endgame.css");
+
+/* 6. Утилитарные классы */
+@import url("./utilities.css");
+
+/* 7. Анимации (keyframes) */
+@import url("./animations.css");
+
+/* 8. Медиа-запросы — последними, они должны перебивать всё */
+@import url("./responsive.css");

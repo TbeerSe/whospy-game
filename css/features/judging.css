@@ -1,0 +1,235 @@
+/* =========================================================
+   css/features/judging.css
+   Интерфейс судейства: голосование, детектор лжи, перехват
+========================================================= */
+@layer features {
+
+/* =========================================================
+   ИНТЕРФЕЙС СУДЕЙСТВА
+========================================================= */
+
+.judging-interface {
+  display: grid;
+  gap: 11px;
+  margin-top: 16px;
+}
+
+.judging-interface[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+  filter: grayscale(0.35);
+}
+
+.judging-accordion {
+  overflow: hidden;
+  border: 1px solid rgba(141, 164, 154, 0.19);
+  border-radius: var(--radius-medium);
+  background: rgba(13, 26, 22, 0.68);
+  box-shadow: var(--shadow-panel);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.judging-accordion[open] {
+  border-color: var(--color-border-strong);
+  background: rgba(17, 34, 28, 0.88);
+  box-shadow: 0 0 20px rgba(114, 246, 174, 0.07);
+}
+
+.judging-accordion summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 54px;
+  padding: 15px 17px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 750;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+
+.judging-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Первый span (заголовок) может ужиматься, чтобы стрелка не съезжала
+   при длинном тексте, например "Модуль голосования мирных". */
+.judging-accordion summary > span:first-child {
+  min-width: 0;
+}
+
+/* Скрываем HTML-стрелку, оставляем только стилизованную через ::after */
+.judging-accordion summary > span + span {
+  display: none;
+}
+
+.judging-accordion summary::after {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+  flex-shrink: 0;
+  place-items: center;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  content: "⌄";
+  font-size: 17px;
+  line-height: 1;
+  transition: transform var(--transition-fast);
+}
+
+.judging-accordion[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.judging-accordion summary:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.judging-accordion__body {
+  padding: 0 17px 17px;
+  border-top: 1px solid rgba(141, 164, 154, 0.13);
+}
+
+.judging-help {
+  margin: 15px 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.judging-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.judging-player-button,
+.judging-location-button {
+  min-height: 42px;
+  padding: 9px 11px;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(141, 164, 154, 0.2);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: left;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.judging-player-button:hover,
+.judging-location-button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  transform: translateY(-1px);
+}
+
+.judging-player-button.is-selected,
+.judging-location-button.is-selected {
+  color: #04120b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.judging-player-button.is-disabled {
+  color: var(--color-text-dim);
+  border-style: dashed;
+  background: transparent;
+  text-decoration: line-through;
+}
+
+.voter-panel {
+  margin-top: 18px;
+  padding-top: 17px;
+  border-top: 1px solid rgba(141, 164, 154, 0.15);
+}
+
+.voter-panel h4 {
+  margin-bottom: 11px;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.voter-panel .button {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.judging-status {
+  min-height: 18px;
+  margin-top: 10px;
+  color: var(--color-orange);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.judging-status--error {
+  color: var(--color-danger);
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 95, 109, 0.25);
+  animation: judging-error-pulse 1.6s ease-in-out infinite;
+}
+
+.judging-location-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.judging-location-button {
+  min-height: 52px;
+  color: var(--color-primary);
+  border-color: rgba(114, 246, 174, 0.24);
+  background: rgba(114, 246, 174, 0.06);
+  text-align: center;
+}
+
+.judging-empty {
+  display: block;
+  padding: 10px 12px;
+  color: var(--color-text-dim);
+  border: 1px dashed rgba(141, 164, 154, 0.2);
+  border-radius: var(--radius-small);
+  font-size: 12px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------
+   PATCH 0.5 — уточнение состояний детектора лжи
+   Комбинация .is-selected + .is-disabled должна показывать
+   «отключённый» вид без остатков выделения (нет зелёного
+   свечения, нет заливки), чтобы клик по недоступному
+   игроку не выглядел как активный выбор.
+   Селектор из двух классов = специфичность 0,3,0 —
+   перебивает и .is-selected, и .is-disabled по отдельности.
+--------------------------------------------------------- */
+
+.judging-player-button.is-selected.is-disabled,
+.judging-location-button.is-selected.is-disabled {
+  color: var(--color-text-dim);
+  border-color: rgba(141, 164, 154, 0.2);
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+  text-decoration: line-through;
+}
+
+} /* @layer features */

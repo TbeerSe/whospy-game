@@ -1,0 +1,200 @@
+/* =========================================================
+   css/layout.css — каркас: shell, header, screens, panels
+========================================================= */
+@layer layout {
+
+/* =========================================================
+   ОСНОВНОЙ КОНТЕЙНЕР
+========================================================= */
+
+.app-shell {
+  width: min(100% - 32px, 1180px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 20px 0 36px;
+  overflow-x: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  min-height: 54px;
+  margin-bottom: 32px;
+}
+
+/* PATCH 0.4.4 — кнопка правил прижимает правую группу
+   (правила + статус + звук) к правому краю шапки. */
+.app-header > #open-rules {
+  margin-left: auto;
+}
+
+.app-header > .header-status {
+  margin-left: 4px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand__mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 10px;
+  background: var(--color-primary-soft);
+  box-shadow: var(--shadow-primary);
+
+  font-size: 28px;
+  line-height: 1;
+  transform: rotate(-12deg);
+}
+
+.brand__eyebrow,
+.section-kicker,
+.panel__eyebrow {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.brand__title {
+  margin-top: 2px;
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.header-status,
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-dim);
+}
+
+.status-dot--active {
+  background: var(--color-primary);
+  box-shadow: 0 0 12px var(--color-primary);
+  animation: status-pulse 1.8s ease-in-out infinite;
+}
+
+/* =========================================================
+   ЭКРАНЫ И ПЕРЕХОДЫ
+========================================================= */
+
+.screens {
+  position: relative;
+}
+
+.screen {
+  animation: screen-enter 420ms ease both;
+}
+
+.screen-heading {
+  max-width: 700px;
+  margin-bottom: 28px;
+}
+
+.screen-title {
+  margin-top: 8px;
+  color: var(--color-text);
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+.screen-description {
+  max-width: 600px;
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 15px;
+}
+
+.settings-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-panel);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.panel__title {
+  margin-top: 5px;
+  color: var(--color-text);
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.panel__icon {
+  color: var(--color-primary);
+  font-size: 24px;
+  text-shadow: 0 0 16px rgba(114, 246, 174, 0.7);
+}
+
+.panel--players,
+.panel--settings,
+.panel--locations {
+  padding: 20px;
+}
+
+.counter-badge {
+  display: inline-flex;
+  min-width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+} /* @layer layout */

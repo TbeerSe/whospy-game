@@ -1,0 +1,411 @@
+/* =========================================================
+   css/responsive.css — все медиа-запросы
+   Специально НЕ в @layer: unlayered всегда перебивает
+   любой @layer, это правильное поведение для медиа.
+========================================================= */
+
+/* =========================================================
+   АДАПТИВНОСТЬ: ПЛАНШЕТЫ
+========================================================= */
+
+@media (min-width: 640px) {
+  .app-shell {
+    width: min(100% - 48px, 1180px);
+    padding-top: 30px;
+  }
+
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .panel--locations {
+    grid-column: 1 / -1;
+  }
+
+  .settings-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .settings-actions .validation-message {
+    flex: 1;
+    align-self: center;
+  }
+
+  .settings-actions .button {
+    min-width: 240px;
+  }
+
+  .locations-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .game-controls {
+    display: flex;
+    justify-content: center;
+  }
+
+  .game-controls .button {
+    min-width: 190px;
+  }
+
+  .judging-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .judging-location-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   АДАПТИВНОСТЬ: ДЕСКТОП
+========================================================= */
+
+@media (min-width: 960px) {
+  .app-shell {
+    padding-top: 42px;
+    padding-bottom: 54px;
+  }
+
+  .app-header {
+    margin-bottom: 48px;
+  }
+
+  .settings-layout {
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .panel--locations {
+    grid-column: 1 / -1;
+  }
+
+  .panel--players,
+  .panel--settings,
+  .panel--locations {
+    padding: 25px;
+  }
+
+  .locations-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .location-card {
+    min-height: 122px;
+  }
+
+  .location-card__name {
+    font-size: 14px;
+  }
+
+  .dealing-layout {
+    gap: 22px;
+  }
+
+  .player-turn-card,
+  .role-card {
+    padding: 40px;
+  }
+
+  .timer-panel {
+    min-height: 470px;
+  }
+}
+
+/* =========================================================
+   PATCH 0.5.2 — МОБИЛЬНЫЙ SHELL + ШАПКА
+   Причина прошлой «обрезки» слева: .app-shell имел
+   overflow-x: hidden и width: min(100% - 22px, …), тень
+   .brand__mark упиралась ровно в левую границу shell и
+   обрезалась. Теперь:
+   - shell занимает 100% ширины и использует padding как гутер;
+   - padding-box шире контента, поэтому тень не режется;
+   - гуттер 16px, тень бренда ослаблена.
+========================================================= */
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: 100%;
+    padding: 20px 16px 30px;
+  }
+
+  .app-header {
+    gap: 10px;
+    min-height: 46px;
+    margin-bottom: 20px;
+  }
+
+  .brand {
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand__mark {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    font-size: 22px;
+    border-radius: 9px;
+    /* Мягче свечение — не касается края экрана */
+    box-shadow: 0 0 10px rgba(114, 246, 174, 0.16);
+  }
+
+  .brand__eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.1em;
+  }
+
+  .brand__title {
+    font-size: 17px;
+    letter-spacing: 0.14em;
+  }
+
+  .app-header > #open-rules {
+    padding: 6px 10px;
+    font-size: 11px;
+    min-height: 32px;
+  }
+
+  .header-status {
+    font-size: 9px;
+  }
+
+  .sound-toggle {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 520px) {
+  .app-header {
+    gap: 8px;
+  }
+
+  /* Убираем декоративный подзаголовок — экономим половину ширины бренда */
+  .brand__eyebrow {
+    display: none;
+  }
+
+  .brand__title {
+    margin-top: 0;
+    font-size: 16px;
+  }
+
+  /* Оставляем только пульсирующую точку — текст «СИСТЕМА ГОТОВА»
+     на телефоне не несёт пользы, а место занимает */
+  .header-status > span:not(.status-dot) {
+    display: none;
+  }
+
+  .header-status {
+    margin-left: 0;
+    gap: 0;
+  }
+
+  /* Кнопка «Правила» прижимает правую группу к правому краю */
+  .app-header > #open-rules {
+    margin-left: auto;
+    padding: 5px 9px;
+    font-size: 11px;
+  }
+
+  /* Тумблер звука примыкает к статусу */
+  .sound-toggle {
+    margin-left: 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-header {
+    gap: 6px;
+  }
+
+  .brand__mark {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    font-size: 20px;
+  }
+
+  .brand__title {
+    font-size: 15px;
+    letter-spacing: 0.12em;
+  }
+
+  .app-header > #open-rules {
+    padding: 5px 8px;
+  }
+}
+
+/* =========================================================
+   АДАПТИВНОСТЬ: МОБИЛЬНЫЕ — ОСТАЛЬНЫЕ БЛОКИ
+========================================================= */
+
+@media (max-width: 520px) {
+  .equipment-shop-modal__content {
+    padding: 22px 17px;
+  }
+
+  .equipment-item {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    text-align: center;
+  }
+
+  .equipment-item__icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    align-self: center;
+    margin: 0 auto;
+    font-size: 21px;
+  }
+
+  .equipment-item__body {
+    width: 100%;
+    text-align: center;
+  }
+
+  .equipment-item__body h3,
+  .equipment-item__body p {
+    text-align: center;
+  }
+
+  .equipment-item__actions {
+    display: grid;
+    width: 100%;
+  }
+
+  .equipment-item__actions .button {
+    width: 100%;
+  }
+
+  .confirm-intercept-modal__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .judging-list,
+  .judging-location-list {
+    grid-template-columns: 1fr;
+  }
+
+  .judging-accordion summary {
+    min-height: 50px;
+    padding: 13px 14px;
+    font-size: 12px;
+  }
+
+  .judging-accordion__body {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .player-name-button {
+    max-width: calc(100vw - 115px);
+  }
+}
+
+@media (max-width: 420px) {
+  .app-shell {
+    /* Ширина уже 100%, гутер даёт padding.
+       Здесь только вертикальные отступы и общий «воздух». */
+    width: 100%;
+    padding: 15px 14px 26px;
+  }
+
+  .app-header {
+    margin-bottom: 22px;
+  }
+
+  .screen-title {
+    font-size: 30px;
+  }
+
+  .panel--players,
+  .panel--settings,
+  .panel--locations {
+    padding: 16px;
+  }
+
+  .locations-grid {
+    gap: 7px;
+  }
+
+  .location-card {
+    min-height: 88px;
+    padding: 10px;
+  }
+
+  .location-card__name {
+    font-size: 11px;
+  }
+
+  .location-card__roles {
+    font-size: 9px;
+  }
+
+  .audit-window__content {
+    min-height: 360px;
+    padding: 20px 14px;
+  }
+
+  .audit-log {
+    font-size: 10px;
+  }
+
+  .role-card__stamp {
+    right: -40px;
+  }
+
+  .modal__content {
+    padding: 18px;
+  }
+
+  .confirm-intercept-modal__content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 360px) {
+  .player-name-button {
+    gap: 3px;
+    padding-right: 3px;
+    padding-left: 3px;
+    font-size: 12px;
+  }
+
+  .player-item__balance {
+    font-size: 9px;
+  }
+
+  .player-item__rank {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+
+  .equipment-shop-modal__title {
+    font-size: 25px;
+  }
+}
+
+/* =========================================================
+   ПРЕДПОЧТЕНИЕ УМЕНЬШЕННОЙ АНИМАЦИИ
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
