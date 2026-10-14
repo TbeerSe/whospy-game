@@ -1,0 +1,1255 @@
+/* =========================================================
+   css/components.css — формы, кнопки, модалки, toast
+========================================================= */
+@layer components {
+
+/* =========================================================
+   ФОРМЫ
+========================================================= */
+
+.form-stack {
+  display: grid;
+  gap: 20px;
+}
+
+.form-field,
+.form-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.text-input,
+.select-input,
+.textarea-input {
+  width: 100%;
+  color: var(--color-text);
+  border: 1px solid rgba(141, 164, 154, 0.2);
+  border-radius: var(--radius-small);
+  outline: none;
+  background: rgba(0, 0, 0, 0.22);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.text-input,
+.select-input {
+  height: 46px;
+  padding: 0 13px;
+}
+
+.textarea-input {
+  min-height: 130px;
+  padding: 12px 13px;
+  resize: vertical;
+}
+
+.text-input::placeholder,
+.textarea-input::placeholder {
+  color: var(--color-text-dim);
+}
+
+.text-input:hover,
+.select-input:hover,
+.textarea-input:hover,
+.text-input:focus,
+.select-input:focus,
+.textarea-input:focus {
+  border-color: var(--color-border-strong);
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.select-input {
+  appearance: none;
+  padding-right: 40px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-primary) 50%),
+    linear-gradient(135deg, var(--color-primary) 50%, transparent 50%);
+  background-position:
+    calc(100% - 17px) 19px,
+    calc(100% - 12px) 19px;
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+}
+
+.select-input option {
+  color: var(--color-text);
+  background: #10221b;
+}
+
+.input-with-suffix {
+  position: relative;
+}
+
+.radio-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+
+  border: 1px solid rgba(141, 164, 154, 0.16);
+  border-radius: var(--radius-medium);
+  background: rgba(255, 255, 255, 0.022);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.radio-card + .radio-card {
+  margin-top: 9px;
+}
+
+.radio-card:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.radio-card input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.radio-card:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: var(--shadow-primary);
+}
+
+.radio-card__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.radio-card__title {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.radio-card__description {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.radio-card__indicator {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  margin-left: auto;
+  border: 1px solid var(--color-text-dim);
+  border-radius: 50%;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.radio-card:has(input:checked) .radio-card__indicator {
+  border: 5px solid var(--color-primary);
+  box-shadow: 0 0 10px rgba(114, 246, 174, 0.55);
+}
+
+/* =========================================================
+   КНОПКИ
+========================================================= */
+
+.button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 10px 16px;
+
+  color: var(--color-text);
+  border: 1px solid transparent;
+  border-radius: var(--radius-small);
+
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.2;
+  text-align: center;
+
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button__icon {
+  color: currentColor;
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+.button--primary {
+  color: #04120b;
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.button--primary:hover {
+  background: #a1ffca;
+  box-shadow:
+    0 0 24px rgba(114, 246, 174, 0.32),
+    0 0 50px rgba(114, 246, 174, 0.12);
+}
+
+.button--secondary {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.button--secondary:hover {
+  background: rgba(114, 246, 174, 0.24);
+  box-shadow: var(--shadow-primary);
+}
+
+.button--danger {
+  color: #ffd9dc;
+  border-color: rgba(255, 95, 109, 0.38);
+  background: var(--color-danger-soft);
+}
+
+.button--danger:hover {
+  border-color: var(--color-danger);
+  background: rgba(255, 95, 109, 0.23);
+  box-shadow: 0 0 22px rgba(255, 95, 109, 0.18);
+}
+
+.button--ghost {
+  min-height: 34px;
+  padding: 7px 10px;
+  color: var(--color-text-muted);
+  border-color: rgba(141, 164, 154, 0.2);
+  background: transparent;
+}
+
+.button--ghost:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.button--small {
+  font-size: 11px;
+}
+
+.button--large {
+  min-height: 52px;
+  padding: 14px 20px;
+  font-size: 14px;
+}
+
+.button--full {
+  width: 100%;
+}
+
+.button--icon {
+  width: 46px;
+  flex: 0 0 46px;
+  padding: 0;
+  font-size: 24px;
+}
+
+.button.is-success {
+  color: #04120b;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.button.is-failure {
+  color: #ffd9dc;
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.settings-actions {
+  display: grid;
+  gap: 12px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.validation-message {
+  min-height: 18px;
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.validation-message:empty {
+  display: none;
+}
+
+/* =========================================================
+   МОДАЛЬНЫЕ ОКНА (общий каркас)
+========================================================= */
+
+.modal {
+  width: min(calc(100% - 28px), 620px);
+  max-height: min(90vh, 760px);
+  padding: 0;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background: var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.6),
+    var(--shadow-primary);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.74);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.modal__content {
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 22px;
+}
+
+.modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.modal__title {
+  margin-top: 5px;
+  color: var(--color-text);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.modal__description {
+  margin-bottom: 22px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 22px;
+}
+
+.icon-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+
+  color: var(--color-text-muted);
+  border: 1px solid rgba(141, 164, 154, 0.2);
+  border-radius: 8px;
+  background: transparent;
+
+  font-size: 24px;
+  line-height: 1;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.icon-button:hover {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast {
+  position: fixed;
+  z-index: 20;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 12px 15px;
+
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: rgba(12, 31, 23, 0.94);
+  box-shadow: var(--shadow-primary);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  font-size: 13px;
+  text-align: center;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition:
+    opacity var(--transition-normal),
+    transform var(--transition-normal);
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   МОДАЛКА ПОДТВЕРЖДЕНИЯ ПЕРЕХВАТА ЛОКАЦИИ
+========================================================= */
+
+.confirm-intercept-modal {
+  width: min(calc(100% - 28px), 480px);
+  max-height: min(90vh, 640px);
+  padding: 0;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 95, 109, 0.12),
+      transparent 38%
+    ),
+    var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    0 0 24px rgba(255, 95, 109, 0.14);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.confirm-intercept-modal::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.confirm-intercept-modal__content {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.confirm-intercept-modal__title {
+  max-width: calc(100% - 45px);
+  color: var(--color-text);
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+/* Алиас __message — защита от рассогласования JS/CSS.
+   Стилизуется идентично __description.
+   white-space: pre-line — сохраняем переводы строк,
+   которые JS вставляет через "\n\n". */
+.confirm-intercept-modal__description,
+.confirm-intercept-modal__message {
+  margin-top: 12px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.confirm-intercept-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* =========================================================
+   МОДАЛКА КАСТОМНЫХ ПАКОВ
+========================================================= */
+
+.custom-location-form {
+  display: grid;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(141, 164, 154, 0.14);
+}
+
+.custom-packs-list-wrapper {
+  margin-top: 22px;
+}
+
+.custom-packs-list {
+  display: grid;
+  gap: 9px;
+}
+
+.custom-pack-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+
+  border: 1px solid rgba(141, 164, 154, 0.16);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.custom-pack-item__name {
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.custom-pack-item__roles {
+  margin-top: 3px;
+  color: var(--color-text-dim);
+  font-size: 11px;
+}
+
+.custom-pack-item__delete {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+
+  color: var(--color-text-dim);
+  border-radius: 7px;
+  background: transparent;
+
+  font-size: 18px;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.custom-pack-item__delete:hover {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+}
+
+.empty-state--compact {
+  min-height: 70px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+} /* @layer components */
+
+/* =========================================================
+   ДОПОЛНЕНИЕ (PATCH 0.5): КНОПКА ТУМБЛЕРА ЗВУКА
+   Вставляется в .app-header / .header-status через JS.
+   window.__spyfall.toggleSound() переключает .is-muted.
+========================================================= */
+@layer components {
+
+.sound-toggle {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  padding: 0;
+
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 9px;
+  background: var(--color-primary-soft);
+
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.sound-toggle::before {
+  content: "♪";
+  line-height: 1;
+}
+
+.sound-toggle:hover {
+  box-shadow: var(--shadow-primary);
+  transform: translateY(-1px);
+}
+
+.sound-toggle:active {
+  transform: translateY(0);
+}
+
+.sound-toggle.is-muted {
+  color: var(--color-text-dim);
+  border-color: rgba(141, 164, 154, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sound-toggle.is-muted::before {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+} /* @layer components */
+/* =========================================================
+   PATCH 0.6.4 — редактирование паков, импорт, undo/redo
+========================================================= */
+@layer components {
+
+.custom-packs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(141, 164, 154, 0.14);
+}
+
+.custom-packs-toolbar .button {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.custom-location-form__edit-hint {
+  margin: 8px 0 12px;
+  padding: 8px 11px;
+  color: var(--color-primary);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-primary-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+.custom-location-form__edit-hint strong {
+  color: var(--color-text);
+}
+
+.custom-pack-item__info {
+  min-width: 0;
+  flex: 1;
+}
+
+.custom-pack-item__actions {
+  display: flex;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.custom-pack-item__edit,
+.custom-pack-item__undo,
+.custom-pack-item__redo {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+
+  color: var(--color-text-dim);
+  border-radius: 7px;
+  background: transparent;
+
+  font-size: 15px;
+  line-height: 1;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    opacity var(--transition-fast);
+}
+
+.custom-pack-item__edit:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.custom-pack-item__undo:hover:not(:disabled) {
+  color: var(--color-orange);
+  background: var(--color-orange-soft);
+}
+
+.custom-pack-item__redo:hover:not(:disabled) {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.custom-pack-item__undo:disabled,
+.custom-pack-item__redo:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+} /* @layer components */
+
+/* =========================================================
+   PATCH 0.6.6 — экспорт/импорт игроков, сброс прогресса
+========================================================= */
+@layer components {
+
+/* ---------- Тулбар в панели «Участники» ---------- */
+.players-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px dashed rgba(141, 164, 154, 0.14);
+}
+
+.players-toolbar .button {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Специально для кнопки сброса — красная ghost */
+.button--danger-ghost {
+  color: var(--color-danger);
+  border-color: rgba(255, 95, 109, 0.32);
+  background: transparent;
+}
+
+.button--danger-ghost:hover {
+  color: #ffd9dc;
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+  box-shadow: 0 0 14px rgba(255, 95, 109, 0.18);
+}
+
+/* ---------- Eyebrow красного цвета (для опасной модалки) ---------- */
+.panel__eyebrow--danger {
+  color: var(--color-danger);
+}
+
+/* ---------- Модалка сброса прогресса ---------- */
+.modal--danger {
+  border-color: rgba(255, 95, 109, 0.42);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(255, 95, 109, 0.14),
+      transparent 42%
+    ),
+    var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.7),
+    0 0 28px rgba(255, 95, 109, 0.14);
+}
+
+.modal--danger .modal__title {
+  color: #ffd9dc;
+  text-shadow: 0 0 12px rgba(255, 95, 109, 0.25);
+}
+
+.modal__danger-list {
+  margin: 4px 0 18px;
+  padding: 12px 14px 12px 30px;
+
+  color: var(--color-text);
+  border: 1px solid rgba(255, 95, 109, 0.28);
+  border-radius: var(--radius-small);
+  background: var(--color-danger-soft);
+
+  font-size: 13px;
+  line-height: 1.65;
+  list-style: disc;
+}
+
+.modal__danger-list li::marker {
+  color: var(--color-danger);
+}
+
+.modal__danger-list strong {
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+.modal__danger-note {
+  margin-bottom: 4px;
+  color: var(--color-danger);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+} /* @layer components */
+
+
+/* =========================================================
+   PATCH 0.6.7 — ГРУППА КНОПОК В ШАПКЕ
+========================================================= */
+@layer components {
+
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.header-actions .button {
+  white-space: nowrap;
+}
+
+.header-actions__icon {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.header-actions__label {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+/* =========================================================
+   PATCH 0.6.7 — МОДАЛКА СТАТИСТИКИ РАУНДОВ
+========================================================= */
+
+.modal--wide {
+  width: min(calc(100% - 24px), 760px);
+}
+
+.modal__actions--single {
+  grid-template-columns: 1fr;
+}
+
+.statistics-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.stat-round {
+  overflow: hidden;
+  border: 1px solid rgba(141, 164, 154, 0.19);
+  border-radius: var(--radius-medium);
+  background: rgba(13, 26, 22, 0.68);
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.stat-round[open] {
+  border-color: var(--color-border-strong);
+  background: rgba(17, 34, 28, 0.88);
+}
+
+.stat-round summary {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.stat-round summary::-webkit-details-marker {
+  display: none;
+}
+
+.stat-round summary:hover {
+  background: var(--color-primary-soft);
+}
+
+.stat-round__date {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.stat-round__winner {
+  padding: 2px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.stat-round__winner--civilians {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.stat-round__winner--spies {
+  color: var(--color-danger);
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+}
+
+.stat-round__meta {
+  overflow: hidden;
+  color: var(--color-text-dim);
+  font-size: 11px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-round__body {
+  padding: 6px 13px 14px;
+  border-top: 1px solid rgba(141, 164, 154, 0.13);
+}
+
+.stat-players {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.stat-player {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 12px;
+}
+
+.stat-player__name {
+  overflow: hidden;
+  color: var(--color-text);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stat-player__excluded {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  color: var(--color-text-dim);
+  border: 1px dashed rgba(141, 164, 154, 0.3);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  vertical-align: middle;
+}
+
+.stat-player__role {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.stat-player__gadgets {
+  color: var(--color-text-dim);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.stat-player__delta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.stat-player__delta--up {
+  color: var(--color-primary);
+}
+
+.stat-player__delta--down {
+  color: var(--color-danger);
+}
+
+.stat-player__delta--zero {
+  color: var(--color-text-dim);
+}
+
+.stat-detail {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(141, 164, 154, 0.14);
+}
+
+.stat-detail__line {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.stat-detail__line strong {
+  color: var(--color-text);
+}
+
+/* =========================================================
+   PATCH 0.6.7 — СВОДКА В МОДАЛКЕ ИМПОРТА
+========================================================= */
+
+.import-full-backup__summary {
+  margin: 12px 0 4px;
+  padding: 10px 12px;
+  color: var(--color-text-muted);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-primary-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+} /* @layer components */
+
+
+/* =========================================================
+   PATCH 0.6.7 — КНОПКА "?" В КАРТОЧКЕ РАУНДА
+========================================================= */
+@layer components {
+
+.stat-round summary {
+  grid-template-columns: auto auto 1fr auto;
+}
+
+.stat-round__details-btn {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  place-items: center;
+  padding: 0;
+
+  color: var(--color-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.stat-round__details-btn:hover {
+  background: rgba(114, 246, 174, 0.24);
+  box-shadow: var(--shadow-primary);
+  transform: scale(1.06);
+}
+
+/* =========================================================
+   PATCH 0.6.7 — МОДАЛКА ДЕТАЛЕЙ РАУНДА
+========================================================= */
+
+.round-detail {
+  display: grid;
+  gap: 18px;
+  margin-top: 6px;
+}
+
+.round-detail__summary {
+  display: grid;
+  gap: 8px;
+  padding: 14px 15px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-medium);
+  background: var(--color-primary-soft);
+}
+
+.round-detail__summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+}
+
+.round-detail__label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.round-detail__value {
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.round-detail__section {
+  display: grid;
+  gap: 8px;
+}
+
+.round-detail__section-title {
+  margin: 0;
+  padding-bottom: 6px;
+
+  color: var(--color-primary);
+  border-bottom: 1px dashed rgba(141, 164, 154, 0.18);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.round-detail__line {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.round-detail__line strong {
+  color: var(--color-text);
+}
+
+/* --- Хронология --- */
+.round-detail__events {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.round-detail__event {
+  display: grid;
+  grid-template-columns: 52px 22px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.025);
+
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.round-detail__event-time {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-align: right;
+}
+
+.round-detail__event-icon {
+  font-size: 14px;
+  text-align: center;
+}
+
+.round-detail__event-text {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* --- Голосование --- */
+.round-detail__votes {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.round-detail__votes li {
+  padding: 5px 10px;
+  color: var(--color-text);
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.round-detail__arrow {
+  color: var(--color-primary);
+  margin: 0 4px;
+}
+
+.round-detail__ok {
+  color: var(--color-primary);
+}
+
+.round-detail__bad {
+  color: var(--color-danger);
+}
+
+/* =========================================================
+   PATCH 0.6.7 — РАДИО-ВЫБОР В МОДАЛКЕ СБРОСА
+========================================================= */
+
+.reset-mode {
+  min-width: 0;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+
+.reset-mode .radio-card + .radio-card {
+  margin-top: 9px;
+}
+
+} /* @layer components */

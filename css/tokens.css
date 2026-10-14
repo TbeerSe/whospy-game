@@ -1,0 +1,63 @@
+/* =========================================================
+   css/tokens.css — CSS-переменные
+========================================================= */
+@layer tokens {
+
+:root {
+  color-scheme: dark;
+
+  --color-bg: #050908;
+  --color-bg-soft: #091310;
+  --color-panel: rgba(13, 26, 22, 0.78);
+  --color-panel-strong: rgba(17, 34, 28, 0.94);
+  --color-border: rgba(111, 255, 183, 0.18);
+  --color-border-strong: rgba(111, 255, 183, 0.42);
+
+  --color-text: #edf9f1;
+  --color-text-muted: #8da49a;
+  --color-text-dim: #6f8880;
+
+  --color-primary: #72f6ae;
+  --color-primary-soft: rgba(114, 246, 174, 0.14);
+  --color-primary-dark: #1d9e63;
+
+  --color-orange: #ff9a4a;
+  --color-orange-soft: rgba(255, 154, 74, 0.14);
+
+  --color-danger: #ff5f6d;
+  --color-danger-soft: rgba(255, 95, 109, 0.14);
+
+  --shadow-panel:
+    0 18px 50px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
+
+  --shadow-primary:
+    0 0 18px rgba(114, 246, 174, 0.2),
+    0 0 40px rgba(114, 246, 174, 0.08);
+
+  --radius-small: 8px;
+  --radius-medium: 14px;
+  --radius-large: 22px;
+
+  --transition-fast: 160ms ease;
+  --transition-normal: 280ms ease;
+  --transition-slow: 500ms ease;
+
+  --font-mono:
+    "SFMono-Regular",
+    "Cascadia Code",
+    "Roboto Mono",
+    Consolas,
+    monospace;
+
+  --font-sans:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+} /* @layer tokens */

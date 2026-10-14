@@ -1,0 +1,17 @@
+{
+  "name": "ШПИОН — секретная операция",
+  "short_name": "ШПИОН",
+  "description": "Браузерная игра по мотивам Spyfall: личные коды, экономика, магазин гаджетов.",
+  "lang": "ru",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#050908",
+  "theme_color": "#07100e",
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

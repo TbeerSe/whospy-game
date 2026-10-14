@@ -1,0 +1,182 @@
+/* =========================================================
+   css/features/locations.css
+   Табы паков, карточки локаций, мультивыбор (PATCH 0.4)
+========================================================= */
+@layer features {
+
+/* =========================================================
+   ЛОКАЦИИ
+========================================================= */
+
+.location-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.location-tab {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+
+  color: var(--color-text-muted);
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.location-tab:hover,
+.location-tab.is-active {
+  color: var(--color-primary);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.location-card {
+  position: relative;
+  min-height: 96px;
+  padding: 13px;
+
+  border: 1px solid rgba(141, 164, 154, 0.16);
+  border-radius: var(--radius-medium);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.location-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.location-card.is-selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  box-shadow: var(--shadow-primary);
+}
+
+.location-card__icon {
+  margin-bottom: 9px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 17px;
+}
+
+.location-card__name {
+  padding-right: 5px;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.location-card__roles {
+  margin-top: 5px;
+  color: var(--color-text-dim);
+  font-size: 10px;
+  line-height: 1.35;
+}
+
+.location-card__check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  display: grid;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+
+  color: #04120b;
+  border-radius: 50%;
+  background: var(--color-primary);
+
+  font-size: 11px;
+  font-weight: 900;
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.location-card.is-selected .location-card__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* =========================================================
+   PATCH 0.4 — мультивыбор локаций
+========================================================= */
+
+.selected-locations-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.location-card:not(.is-selected)::after {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 18px;
+  height: 18px;
+
+  border: 1px solid var(--color-border-strong);
+  border-radius: 4px;
+  background: rgba(114, 246, 174, 0.06);
+  content: "";
+
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.82);
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast),
+    background var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.location-card:not(.is-selected):hover::after,
+.location-card:not(.is-selected):focus-visible::after {
+  opacity: 0.68;
+  transform: scale(1);
+}
+
+.location-card.is-selected .location-card__check {
+  z-index: 1;
+}
+
+} /* @layer features */

@@ -1,0 +1,150 @@
+/* =========================================================
+   css/features/audit.css
+   Экран аудита энтропии
+========================================================= */
+@layer features {
+
+/* =========================================================
+   АУДИТ ЭНТРОПИИ
+========================================================= */
+
+.screen--audit {
+  display: grid;
+  min-height: calc(100vh - 130px);
+  place-items: center;
+}
+
+.audit-window {
+  width: min(100%, 720px);
+  overflow: hidden;
+
+  border: 1px solid rgba(114, 246, 174, 0.3);
+  border-radius: var(--radius-medium);
+  background: rgba(2, 10, 7, 0.92);
+  box-shadow:
+    0 0 40px rgba(114, 246, 174, 0.1),
+    inset 0 0 40px rgba(114, 246, 174, 0.025);
+
+  font-family: var(--font-mono);
+}
+
+.audit-window__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+
+  border-bottom: 1px solid rgba(114, 246, 174, 0.18);
+  background: rgba(114, 246, 174, 0.06);
+}
+
+.terminal-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.terminal-controls span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-text-dim);
+}
+
+.terminal-controls span:first-child {
+  background: var(--color-danger);
+}
+
+.terminal-controls span:nth-child(2) {
+  background: var(--color-orange);
+}
+
+.terminal-controls span:last-child {
+  background: var(--color-primary);
+}
+
+.audit-window__title {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.audit-window__status {
+  margin-left: auto;
+  color: var(--color-primary);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.audit-window__content {
+  min-height: 390px;
+  padding: 24px 18px;
+}
+
+.audit-title {
+  margin-bottom: 24px;
+  color: var(--color-primary);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+.audit-log {
+  display: grid;
+  gap: 12px;
+  min-height: 210px;
+  color: #a8eec2;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.audit-log__line {
+  animation: terminal-line 180ms ease both;
+}
+
+.audit-log__line::before {
+  margin-right: 8px;
+  color: var(--color-primary);
+  content: ">";
+}
+
+.audit-log__line--success {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.audit-log__line--warning {
+  color: var(--color-orange);
+}
+
+.audit-log__line--danger {
+  color: var(--color-danger);
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(255, 95, 109, 0.25);
+}
+
+.audit-progress {
+  height: 5px;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(114, 246, 174, 0.12);
+}
+
+.audit-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--color-primary);
+  box-shadow: 0 0 14px var(--color-primary);
+  animation: audit-progress 2s linear forwards;
+}
+
+.audit-cursor {
+  margin-top: 12px;
+  color: var(--color-primary);
+  animation: cursor-blink 700ms steps(2) infinite;
+}
+
+} /* @layer features */

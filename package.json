@@ -1,0 +1,18 @@
+{
+  "name": "whospy",
+  "version": "0.8.5",
+  "private": true,
+  "type": "module",
+  "description": "ШПИОН — браузерная игра по мотивам Spyfall (чистый HTML/CSS/JS)",
+  "scripts": {
+    "serve": "python3 -m http.server 8765",
+    "test:unit": "node tests/unit.cjs",
+    "test:e2e": "node tests/e2e.cjs",
+    "test:smoke": "node tests/smoke.cjs",
+    "test": "node tests/economy.unit.mjs && node tests/smoke.cjs && node tests/unit.cjs && node tests/e2e.cjs",
+    "test:economy": "node tests/economy.unit.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}

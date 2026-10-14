@@ -1,0 +1,200 @@
+/* =========================================================
+   css/features/endgame.css
+   Финал раунда: раскрытие ролей, дельта баланса,
+   метки перехвата и Верификатора.
+   PATCH 0.7.0
+========================================================= */
+@layer features {
+
+/* =========================================================
+   PATCH 0.1 — ПООЧЕРЁДНОЕ РАСКРЫТИЕ РОЛЕЙ В КОНЦЕ
+========================================================= */
+
+.end-roles-list {
+  display: grid;
+  gap: 10px;
+  max-width: 500px;
+  margin-top: 20px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.end-role-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(141, 164, 154, 0.15);
+  border-radius: var(--radius-small);
+  animation: slide-up-reveal 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--badge-index, 0) * 60ms);
+}
+
+.end-role-badge__name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.end-role-badge__role {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-primary);
+}
+
+.end-role-badge--spy {
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+}
+
+.end-role-badge--spy .end-role-badge__role {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+/* =========================================================
+   PATCH 0.6.0 — ИСКЛЮЧЁННЫЕ ИГРОКИ В ФИНАЛЕ
+========================================================= */
+
+.end-role-badge--excluded {
+  opacity: 0.55;
+  filter: grayscale(0.6);
+  border-style: dashed;
+}
+
+.end-role-badge__excluded {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  color: var(--color-text-dim);
+  border: 1px dashed rgba(141, 164, 154, 0.3);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+/* =========================================================
+   PATCH 0.5 — ДЕЛЬТА БАЛАНСА
+========================================================= */
+
+.end-role-badge__delta {
+  margin-left: auto;
+  padding-left: 10px;
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.end-role-badge__delta--up {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(114, 246, 174, 0.3);
+}
+
+.end-role-badge__delta--down {
+  color: var(--color-danger);
+  text-shadow: 0 0 10px rgba(255, 95, 109, 0.3);
+}
+
+.end-role-badge__delta--zero {
+  color: var(--color-text-dim);
+}
+
+/* =========================================================
+   PATCH 0.6.3 — ИНДИКАТОР НЕВЕРНЫХ ГОЛОСОВ
+========================================================= */
+
+.end-role-badge__wrong-votes {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+
+  color: var(--color-orange);
+  border: 1px solid rgba(255, 154, 74, 0.35);
+  border-radius: 4px;
+  background: var(--color-orange-soft);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   PATCH 0.7.0 — МЕТКИ ПЕРЕХВАТА
+========================================================= */
+
+.end-role-badge__intercept {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+
+  border: 1px solid;
+  border-radius: 4px;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.end-role-badge__intercept--ok {
+  color: var(--color-primary);
+  border-color: rgba(114, 246, 174, 0.38);
+  background: var(--color-primary-soft);
+  box-shadow: 0 0 10px rgba(114, 246, 174, 0.18);
+}
+
+.end-role-badge__intercept--fail {
+  color: var(--color-danger);
+  border-color: rgba(255, 95, 109, 0.4);
+  background: var(--color-danger-soft);
+  text-shadow: 0 0 8px rgba(255, 95, 109, 0.28);
+}
+
+/* =========================================================
+   PATCH 0.7.0 — МЕТКА СГОРЕВШЕГО ВЕРИФИКАТОРА
+========================================================= */
+
+.end-role-badge__verificator {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 8px;
+
+  color: var(--color-orange);
+  border: 1px solid rgba(255, 154, 74, 0.35);
+  border-radius: 4px;
+  background: var(--color-orange-soft);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Обёртка для нескольких меток в одной карточке, чтобы не
+   разъезжались. Если JS добавит .end-role-badge__meta —
+   метки выстроятся в строку под ролью. */
+.end-role-badge__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  margin-top: 6px;
+}
+
+} /* @layer features */

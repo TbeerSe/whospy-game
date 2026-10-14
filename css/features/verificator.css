@@ -1,0 +1,270 @@
+/* =========================================================
+   css/features/verificator.css
+   PATCH 0.7.0 — Верификатор: модалки выбора цели и результата,
+   вспышка экрана.
+========================================================= */
+@layer features {
+
+/* =========================================================
+   МОДАЛКА ВЫБОРА ЦЕЛИ
+========================================================= */
+
+.verificator-target-modal {
+  width: min(calc(100% - 28px), 540px);
+  max-height: min(90vh, 720px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(114, 246, 174, 0.12),
+      transparent 38%
+    ),
+    var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    var(--shadow-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.verificator-target-modal::backdrop {
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.verificator-target-modal__content {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.verificator-target-modal__eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.verificator-target-modal__title {
+  max-width: calc(100% - 45px);
+  color: var(--color-text);
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.verificator-target-modal__hint {
+  margin-top: 12px;
+  margin-bottom: 20px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.verificator-target-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* =========================================================
+   МОДАЛКА РЕЗУЛЬТАТА
+========================================================= */
+
+.verificator-result-modal {
+  width: min(calc(100% - 28px), 460px);
+  max-height: min(90vh, 640px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background: var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    0 0 24px rgba(114, 246, 174, 0.12);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.verificator-result-modal::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.verificator-result-modal__content {
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 26px;
+}
+
+.verificator-result__body {
+  padding: 4px 2px;
+}
+
+.verificator-result__body--civilian {
+  color: var(--color-text);
+}
+
+.verificator-result__body--spy {
+  color: var(--color-text);
+}
+
+.verificator-result__eyebrow {
+  margin-bottom: 14px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.verificator-result__body--spy .verificator-result__eyebrow {
+  color: var(--color-danger);
+}
+
+.verificator-result__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(141, 164, 154, 0.16);
+}
+
+.verificator-result__label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.verificator-result__value {
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 750;
+  text-align: right;
+}
+
+.verificator-result__verdict {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-medium);
+  background: var(--color-primary-soft);
+}
+
+.verificator-result__body--spy .verificator-result__verdict {
+  border-color: rgba(255, 95, 109, 0.42);
+  background: var(--color-danger-soft);
+}
+
+.verificator-result__verdict-label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.verificator-result__verdict-value {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(114, 246, 174, 0.3);
+}
+
+.verificator-result__body--spy .verificator-result__verdict-value {
+  color: var(--color-danger);
+  text-shadow: 0 0 12px rgba(255, 95, 109, 0.35);
+}
+
+.verificator-result__hint {
+  margin-top: 18px;
+  color: var(--color-text-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  text-align: right;
+}
+
+/* =========================================================
+   ВСПЫШКА ЭКРАНА
+   Не зависит от звука — остаётся даже если звук выключен.
+========================================================= */
+
+.verificator-flash {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  pointer-events: none;
+  animation: verificator-flash 600ms ease-out forwards;
+}
+
+.verificator-flash--green {
+  background: radial-gradient(
+    circle at center,
+    rgba(114, 246, 174, 0.42),
+    rgba(114, 246, 174, 0.08) 60%,
+    transparent 100%
+  );
+}
+
+.verificator-flash--red {
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 95, 109, 0.45),
+    rgba(255, 95, 109, 0.09) 60%,
+    transparent 100%
+  );
+}
+
+@keyframes verificator-flash {
+  0% {
+    opacity: 0;
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* =========================================================
+   АДАПТИВ
+========================================================= */
+
+@media (max-width: 520px) {
+  .verificator-target-modal__content,
+  .verificator-result-modal__content {
+    padding: 22px 17px;
+  }
+
+  .verificator-target-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+} /* @layer features */

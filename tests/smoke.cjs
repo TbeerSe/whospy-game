@@ -1,0 +1,20 @@
+const H = require("./helpers.cjs");
+(async () => {
+  const { browser, page, errors } = await H.launch();
+  await H.open(page);
+  console.log("selected:", await H.stateOf(page, "state.selectedLocations.length"));
+  await H.addPlayers(page, ["Аня", "Боря", "Вика", "Гена", "Даша"]);
+  console.log("warning:", await page.textContent("#players-warning"));
+  await H.startMission(page);
+  const info = await H.dealAll(page);
+  console.log(info);
+  console.log("start btn hidden?", await page.$eval("#start-timer", (e) => e.classList.contains("is-hidden")));
+  await page.click("#start-timer");
+  await page.waitForSelector("#game-screen.is-active");
+  console.log("badge:", await page.textContent("#spy-count-badge"));
+  console.log("timer:", await page.textContent("#timer-minutes"), await page.textContent("#timer-seconds"));
+  console.log("snapshot:", await page.evaluate(() => !!localStorage.getItem("spyfall_active_round")));
+  await page.screenshot({ path: require("path").join(require("os").tmpdir(), "whospy-game.png") });
+  console.log("errors:", errors);
+  await browser.close();
+})();

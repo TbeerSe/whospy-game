@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+  <meta
+    name="description"
+    content="Шпион — адаптивная настольная игра Spyfall на чистом HTML, CSS и JavaScript."
+  >
+  <meta name="theme-color" content="#07100e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="format-detection" content="telephone=no">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ШПИОН — секретная операция">
+  <meta
+    property="og:description"
+    content="Браузерная игра по мотивам Spyfall: личные коды, экономика, магазин гаджетов, процедурный звук."
+  >
+  <meta property="og:url" content="https://tbeerse.github.io/whospy-game/">
+  <meta property="og:image" content="https://tbeerse.github.io/whospy-game/images/og-preview.jpg">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ШПИОН — секретная операция">
+  <meta name="twitter:description" content="Браузерная игра по мотивам Spyfall: личные коды, экономика, магазин гаджетов, процедурный звук.">
+  <meta name="twitter:image" content="https://tbeerse.github.io/whospy-game/images/og-preview.jpg">
+
+  <title>Шпион — секретная операция</title>
+
+  <!-- Основные стили приложения -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+  <link rel="apple-touch-icon" href="images/icon-192.png">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <!-- Декоративный фон -->
+  <div class="background-grid" aria-hidden="true"></div>
+  <div class="background-glow background-glow--one" aria-hidden="true"></div>
+  <div class="background-glow background-glow--two" aria-hidden="true"></div>
+
+  <main class="app-shell">
+    <!-- Шапка приложения -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">⌁</div>
+
+        <div>
+          <p class="brand__eyebrow">CLASSIFIED // FIELD GAME</p>
+          <h1 class="brand__title">ШПИОН</h1>
+        </div>
+      </div>
+
+      <!-- PATCH 0.4.4 — кнопка правил (стоит перед .header-status,
+           чтобы динамическая .sound-toggle встала после статуса) -->
+      <div class="header-actions" role="toolbar" aria-label="Действия">
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="open-rules"
+          aria-label="Правила игры"
+          title="Правила игры"
+        >
+          <span class="header-actions__icon" aria-hidden="true">?</span>
+          <span class="header-actions__label">Правила</span>
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="open-statistics"
+          aria-label="Статистика раундов"
+          title="Статистика раундов"
+        >
+          <span class="header-actions__icon" aria-hidden="true">📊</span>
+          <span class="header-actions__label">Статистика</span>
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="export-full-backup"
+          aria-label="Экспорт всех данных"
+          title="Скачать резервную копию"
+        >
+          <span class="header-actions__icon" aria-hidden="true">📥</span>
+          <span class="header-actions__label">Экспорт</span>
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="import-full-backup"
+          aria-label="Импорт данных из файла"
+          title="Загрузить резервную копию"
+        >
+          <span class="header-actions__icon" aria-hidden="true">📁</span>
+          <span class="header-actions__label">Импорт</span>
+        </button>
+
+        <input
+          type="file"
+          id="import-full-backup-input"
+          accept=".json,application/json"
+          hidden
+        >
+      </div>
+
+      <div class="header-status" aria-label="Статус системы">
+        <span class="status-dot status-dot--active"></span>
+        <span>СИСТЕМА ГОТОВА</span>
+      </div>
+    </header>
+
+    <!--
+      Контейнер экранов.
+      JavaScript переключает атрибут hidden и класс is-active
+      у нужного экрана.
+    -->
+    <div class="screens" id="app">
+
+      <!-- =========================================================
+           ЭКРАН 1. НАСТРОЙКА ИГРЫ
+      ========================================================== -->
+      <section
+        class="screen screen--settings is-active"
+        id="settings-screen"
+        data-screen="settings"
+        aria-labelledby="settings-title"
+      >
+        <div class="screen-heading">
+          <p class="section-kicker">ОПЕРАЦИЯ 01 / ПОДГОТОВКА</p>
+
+          <h2 class="screen-title" id="settings-title">
+            Настройка миссии
+          </h2>
+
+          <p class="screen-description">
+            Добавьте участников, выберите локации и настройте правила
+            секретной операции.
+          </p>
+        </div>
+
+        <div class="settings-layout">
+          <!-- Левая/верхняя часть: игроки -->
+          <article class="panel panel--players">
+            <div class="panel__header">
+              <div>
+                <p class="panel__eyebrow">ОТРЯД</p>
+                <h3 class="panel__title">Участники</h3>
+              </div>
+
+              <span class="counter-badge" id="players-count">0</span>
+            </div>
+
+            <div class="players-toolbar">
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                id="export-players"
+                title="Скачать список игроков и их балансы"
+              >
+                📥 Скачать игроков
+              </button>
+
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                id="import-players"
+                title="Загрузить список игроков из JSON"
+              >
+                📁 Загрузить игроков
+              </button>
+
+              <button
+                type="button"
+                class="button button--ghost button--small button--danger-ghost"
+                id="reset-players-progress"
+                title="Обнулить балансы и гаджеты всех игроков"
+              >
+                🔄 Сбросить прогресс
+              </button>
+
+              <input
+                type="file"
+                id="import-players-input"
+                accept=".json,application/json"
+                hidden
+              >
+            </div>
+
+            <div
+              class="players-list"
+              id="players-list"
+              aria-live="polite"
+              aria-label="Список участников"
+            >
+              <!-- Игроки добавляются динамически через JavaScript -->
+            </div>
+
+            <div class="empty-state" id="players-empty-state">
+              <span class="empty-state__icon" aria-hidden="true">+</span>
+              <p>Добавьте минимум 4 участников</p>
+            </div>
+
+            <p
+              class="field-hint field-hint--warning is-hidden"
+              id="players-warning"
+              role="status"
+            ></p>
+
+            <form class="inline-form" id="player-form">
+              <label class="sr-only" for="player-name">
+                Имя участника
+              </label>
+
+              <input
+                type="text"
+                id="player-name"
+                name="playerName"
+                class="text-input"
+                placeholder="Имя участника"
+                maxlength="32"
+                autocomplete="off"
+              >
+
+              <button
+                type="submit"
+                class="button button--secondary button--icon"
+                aria-label="Добавить участника"
+                title="Добавить участника"
+              >
+                <span aria-hidden="true">+</span>
+              </button>
+            </form>
+
+            <p class="field-hint">
+              Имена сохраняются на этом устройстве автоматически.
+            </p>
+          </article>
+
+          <!-- Правая/средняя часть: параметры -->
+          <article class="panel panel--settings">
+            <div class="panel__header">
+              <div>
+                <p class="panel__eyebrow">ПРОТОКОЛ</p>
+                <h3 class="panel__title">Параметры игры</h3>
+              </div>
+
+              <span class="panel__icon" aria-hidden="true">◈</span>
+            </div>
+
+            <div class="form-stack">
+              <div class="form-field">
+                <label class="form-label" for="game-duration">
+                  Время игры
+                </label>
+
+                <div class="input-with-suffix">
+                  <select
+                    id="game-duration"
+                    name="gameDuration"
+                    class="select-input"
+                  >
+                    <option value="5">5 минут</option>
+                    <option value="10" selected>10 минут</option>
+                    <option value="15">15 минут</option>
+                    <option value="20">20 минут</option>
+                    <option value="30">30 минут</option>
+                    <option value="45">45 минут</option>
+                    <option value="60">60 минут</option>
+                  </select>
+                </div>
+              </div>
+
+              <label class="checkbox-card">
+                <input type="checkbox" id="announce-spies" checked>
+
+                <span class="checkbox-card__body">
+                  <span class="checkbox-card__title">
+                    Объявлять число шпионов
+                  </span>
+
+                  <span class="checkbox-card__description">
+                    На экране игры будет видно, сколько шпионов в
+                    раунде и сколько осталось. Выключите, если хотите
+                    играть вслепую.
+                  </span>
+                </span>
+              </label>
+
+              <div class="form-field" id="spies-settings">
+                <label class="form-label" for="spies-count">
+                  Количество шпионов
+                </label>
+
+                <!-- PATCH 0.4 — новые вероятностные режимы -->
+                <select
+                  id="spies-count"
+                  name="spiesCount"
+                  class="select-input"
+                >
+                  <option value="1">Ровно 1 шпион</option>
+                  <option value="p25" selected>Случайно — 1–25% игроков</option>
+                  <option value="p50">Случайно — 1– до 50% игроков</option>
+                </select>
+
+                <p class="field-hint">
+                  Число будет автоматически ограничено количеством игроков.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- Выбор локации -->
+          <article class="panel panel--locations">
+            <div class="panel__header">
+              <div>
+                <p class="panel__eyebrow">РАЗВЕДДАННЫЕ</p>
+                <h3 class="panel__title">Пул локаций</h3>
+              </div>
+
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                id="open-custom-packs"
+              >
+                Кастомные паки
+              </button>
+            </div>
+
+            <div class="location-tabs" role="tablist" aria-label="Паки локаций">
+              <button
+                type="button"
+                class="location-tab is-active"
+                id="default-pack-tab"
+                role="tab"
+                aria-selected="true"
+                aria-controls="default-locations"
+                data-pack="default"
+              >
+                Стандартный пак
+              </button>
+
+              <button
+                type="button"
+                class="location-tab"
+                id="custom-pack-tab"
+                role="tab"
+                aria-selected="false"
+                aria-controls="custom-locations"
+                data-pack="custom"
+              >
+                Мои локации
+              </button>
+            </div>
+
+            <div class="locations-bulk">
+              <span class="locations-bulk__label">Встроенные:</span>
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                data-bulk="select"
+                data-bulk-pack="default"
+              >
+                Выбрать все
+              </button>
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                data-bulk="clear"
+                data-bulk-pack="default"
+              >
+                Снять все
+              </button>
+            </div>
+
+            <div class="locations-bulk">
+              <span class="locations-bulk__label">Мои локации:</span>
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                data-bulk="select"
+                data-bulk-pack="custom"
+              >
+                Выбрать все
+              </button>
+              <button
+                type="button"
+                class="button button--ghost button--small"
+                data-bulk="clear"
+                data-bulk-pack="custom"
+              >
+                Снять все
+              </button>
+            </div>
+
+            <div
+              class="locations-grid"
+              id="default-locations"
+              role="tabpanel"
+              aria-labelledby="default-pack-tab"
+            >
+              <!-- Карточки локаций добавляются JavaScript -->
+            </div>
+
+            <div
+              class="locations-grid is-hidden"
+              id="custom-locations"
+              role="tabpanel"
+              aria-labelledby="custom-pack-tab"
+            >
+              <!-- Кастомные локации добавляются JavaScript -->
+            </div>
+
+            <p class="field-hint" id="location-hint">
+              Выберите минимум 5 локаций для операции.
+            </p>
+          </article>
+        </div>
+
+        <div class="settings-actions">
+          <p class="validation-message" id="settings-validation" role="alert">
+          </p>
+
+          <button
+            type="button"
+            class="button button--primary button--large"
+            id="start-mission"
+          >
+            <span class="button__icon" aria-hidden="true">▶</span>
+            Начать операцию
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ЭКРАН 2. АУДИТ ЭНТРОПИИ
+      ========================================================== -->
+      <section
+        class="screen screen--audit"
+        id="audit-screen"
+        data-screen="audit"
+        aria-labelledby="audit-title"
+        hidden
+      >
+        <div class="audit-window">
+          <div class="audit-window__header">
+            <div class="terminal-controls" aria-hidden="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+
+            <p class="audit-window__title">
+              ENTROPY_AUDIT.EXE
+            </p>
+
+            <span class="audit-window__status">
+              RUNNING
+            </span>
+          </div>
+
+          <div class="audit-window__content">
+            <p class="audit-title" id="audit-title">
+              Синхронизация секретной операции
+            </p>
+
+            <div
+              class="audit-log"
+              id="audit-log"
+              role="log"
+              aria-live="polite"
+              aria-label="Журнал аудита энтропии"
+            >
+              <!-- Строки аудита добавляются JavaScript -->
+            </div>
+
+            <div class="audit-progress" aria-hidden="true">
+              <span id="audit-progress-bar"></span>
+            </div>
+
+            <p class="audit-cursor" aria-hidden="true">
+              _
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ЭКРАН 3. РАЗДАЧА РОЛЕЙ
+      ========================================================== -->
+      <section
+        class="screen screen--dealing"
+        id="dealing-screen"
+        data-screen="dealing"
+        aria-labelledby="dealing-title"
+        hidden
+      >
+        <div class="screen-heading">
+          <p class="section-kicker">ОПЕРАЦИЯ 02 / РАЗДАЧА</p>
+
+          <h2 class="screen-title" id="dealing-title">
+            Секретная карта
+          </h2>
+
+          <p class="screen-description" id="dealing-description">
+            Передайте телефон указанному игроку. Никто не должен видеть чужую
+            роль.
+          </p>
+        </div>
+
+        <div class="dealing-layout">
+          <div class="turn-indicator">
+            <span class="turn-indicator__label">ХОД ИГРОКА</span>
+
+            <span class="turn-indicator__number" id="current-player-number">
+              1
+            </span>
+
+            <span class="turn-indicator__separator">/</span>
+
+            <span class="turn-indicator__total" id="total-players">
+              0
+            </span>
+          </div>
+
+          <article class="player-turn-card panel">
+            <div class="player-turn-card__radar" aria-hidden="true"></div>
+
+            <p class="panel__eyebrow">
+              ПОЛУЧАТЕЛЬ ДАННЫХ
+            </p>
+
+            <h3
+              class="player-turn-card__name"
+              id="current-player-name"
+            >
+              Игрок
+            </h3>
+
+            <p class="player-turn-card__instruction" id="reveal-instruction">
+              Возьмите телефон и нажмите кнопку, чтобы увидеть свою роль.
+            </p>
+
+            <button
+              type="button"
+              class="button button--primary button--large button--full"
+              id="reveal-role"
+            >
+              <span class="button__icon" aria-hidden="true">◉</span>
+              Показать роль
+            </button>
+          </article>
+
+          <!-- Карточка роли, скрытая до нажатия -->
+          <article
+            class="role-card panel is-hidden"
+            id="role-card"
+            aria-live="polite"
+          >
+            <div class="role-card__stamp" aria-hidden="true">
+              CLASSIFIED
+            </div>
+
+            <p class="role-card__label" id="role-card-label">
+              СЕКРЕТНАЯ ИНФОРМАЦИЯ
+            </p>
+
+            <div class="role-card__content">
+              <span class="role-card__icon" id="role-card-icon" aria-hidden="true">
+                ◈
+              </span>
+
+              <h3 class="role-card__title" id="role-card-title">
+                Ваша роль
+              </h3>
+
+              <p class="role-card__location" id="role-card-location">
+                Локация
+              </p>
+
+              <p class="role-card__description" id="role-card-description">
+                Описание роли
+              </p>
+            </div>
+
+            <div class="role-card__code" id="role-card-code"></div>
+
+            <div class="role-card__warning">
+              Не показывайте эту карту другим игрокам.
+              Запомните личный код — он понадобится позже.
+            </div>
+
+            <button
+              type="button"
+              class="button button--secondary button--large button--full"
+              id="hide-role"
+            >
+              <span class="button__icon" aria-hidden="true">↪</span>
+              <span id="hide-role-label">
+                Скрыть карту
+              </span>
+            </button>
+          </article>
+        </div>
+
+        <div class="dealing-footer">
+          <div class="dealing-progress" aria-label="Прогресс раздачи">
+            <span
+              class="dealing-progress__bar"
+              id="dealing-progress-bar"
+            ></span>
+          </div>
+
+          <p class="dealing-progress__text" id="dealing-progress-text">
+            Карты ещё не открывались
+          </p>
+
+          <button
+            type="button"
+            class="button button--primary button--large button--full is-hidden"
+            id="start-timer"
+          >
+            <span class="button__icon" aria-hidden="true">⏱</span>
+            Запустить таймер
+          </button>
+
+          <button
+            type="button"
+            class="button button--ghost button--full"
+            id="cancel-dealing"
+          >
+            Отменить раунд
+          </button>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           ЭКРАН 4. ИГРА И ТАЙМЕР
+      ========================================================== -->
+      <section
+        class="screen screen--game"
+        id="game-screen"
+        data-screen="game"
+        aria-labelledby="game-title"
+        hidden
+      >
+        <div class="game-header">
+          <div>
+            <p class="section-kicker">ОПЕРАЦИЯ 03 / ДОПРОС</p>
+
+            <h2 class="screen-title" id="game-title">
+              Игра началась
+            </h2>
+          </div>
+
+          <span class="spy-badge is-hidden" id="spy-count-badge"></span>
+
+          <span class="live-badge" id="game-status">
+            <span class="status-dot status-dot--active"></span>
+            LIVE
+          </span>
+        </div>
+
+        <article class="timer-panel panel">
+          <div class="timer-panel__decoration" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <p class="timer-panel__label">
+            ОСТАЛОСЬ ВРЕМЕНИ
+          </p>
+
+          <div
+            class="game-timer"
+            id="game-timer"
+            role="timer"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <span id="timer-minutes">10</span>
+            <span class="game-timer__separator">:</span>
+            <span id="timer-seconds">00</span>
+          </div>
+
+          <p class="timer-panel__hint">
+            Задавайте вопросы. Ищите несостыковки.
+          </p>
+
+          <div class="timer-progress">
+            <span id="timer-progress-bar"></span>
+          </div>
+        </article>
+
+        <div
+          class="game-result panel is-hidden"
+          id="game-result"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="game-result__icon" aria-hidden="true">!</span>
+
+          <h3 class="game-result__title">
+            Время истекло!
+          </h3>
+
+          <p class="game-result__description">
+            Победа шпионской команды, если шпион не был вычислен.
+          </p>
+        </div>
+
+        <div class="game-controls">
+          <button
+            type="button"
+            class="button button--secondary button--large"
+            id="pause-game"
+          >
+            <span class="button__icon" aria-hidden="true">Ⅱ</span>
+            Пауза
+          </button>
+
+          <button
+            type="button"
+            class="button button--danger button--large"
+            id="end-game"
+          >
+            <span class="button__icon" aria-hidden="true">✕</span>
+            Отменить раунд
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       МОДАЛЬНОЕ ОКНО: КАСТОМНЫЕ ПАКИ
+  ========================================================== -->
+  <dialog
+    class="modal"
+    id="custom-packs-modal"
+    aria-labelledby="custom-packs-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">ПОЛЬЗОВАТЕЛЬСКИЕ ДАННЫЕ</p>
+
+          <h2 class="modal__title" id="custom-packs-title">
+            Кастомные паки
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-custom-packs"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        Создайте собственную локацию и добавьте уникальные роли для участников.
+      </p>
+
+      <div class="locations-bulk">
+        <span class="locations-bulk__label">Мои локации в пуле:</span>
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          data-bulk="select"
+          data-bulk-pack="custom"
+        >
+          Выбрать все кастомные
+        </button>
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          data-bulk="clear"
+          data-bulk-pack="custom"
+        >
+          Снять все кастомные
+        </button>
+      </div>
+
+      <div class="custom-packs-toolbar">
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="example-custom-packs"
+          title="Скачать пример JSON-файла"
+        >
+          📄 Пример
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="import-custom-packs"
+        >
+          📁 Загрузить из файла
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--small"
+          id="export-custom-packs"
+          title="Скачать все кастомные локации"
+        >
+          📥 Скачать JSON
+        </button>
+
+        <input
+          type="file"
+          id="import-custom-packs-input"
+          accept=".json,application/json"
+          hidden
+        >
+      </div>
+
+      <form class="custom-location-form" id="custom-location-form">
+        <div class="form-field">
+          <label class="form-label" for="custom-location-name">
+            Название локации
+          </label>
+
+          <input
+            type="text"
+            class="text-input"
+            id="custom-location-name"
+            name="customLocationName"
+            placeholder="Например: Заброшенный маяк"
+            maxlength="64"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="custom-location-roles">
+            Роли
+          </label>
+
+          <textarea
+            class="textarea-input"
+            id="custom-location-roles"
+            name="customLocationRoles"
+            placeholder="Смотритель&#10;Радист&#10;Капитан катера&#10;Исследователь&#10;Контрабандист"
+            rows="6"
+            required
+          ></textarea>
+
+          <p class="field-hint">
+            Указывайте по одной роли в каждой строке. Минимум 5 ролей.
+          </p>
+        </div>
+
+        <p
+          class="validation-message"
+          id="custom-location-validation"
+          role="alert"
+        ></p>
+
+        <p
+          class="custom-location-form__edit-hint is-hidden"
+          id="custom-location-edit-hint"
+        >
+          ✎ Режим редактирования:
+          <strong id="custom-location-edit-name"></strong>
+        </p>
+
+        <button
+          type="submit"
+          class="button button--primary button--full"
+          id="custom-location-submit"
+        >
+          Добавить локацию
+        </button>
+
+        <button
+          type="button"
+          class="button button--ghost button--full is-hidden"
+          id="custom-location-cancel-edit"
+        >
+          Отменить редактирование
+        </button>
+      </form>
+
+      <div class="custom-packs-list-wrapper">
+        <div class="panel__header">
+          <h3 class="panel__title">
+            Сохранённые локации
+          </h3>
+
+          <span class="counter-badge" id="custom-locations-count">0</span>
+        </div>
+
+        <div
+          class="custom-packs-list"
+          id="custom-packs-list"
+          aria-live="polite"
+        >
+          <!-- Список кастомных локаций добавляется JavaScript -->
+        </div>
+
+        <p
+          class="empty-state empty-state--compact"
+          id="custom-packs-empty-state"
+        >
+          Кастомных локаций пока нет.
+        </p>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Диалог подтверждения завершения игры -->
+  <dialog
+    class="modal modal--confirm"
+    id="confirm-end-modal"
+    aria-labelledby="confirm-end-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">ПРЕРЫВАНИЕ МИССИИ</p>
+
+          <h2 class="modal__title" id="confirm-end-title">
+            Отменить раунд?
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-confirm-end"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        Раунд будет отменён: никто ничего не получит и не потеряет, а
+        купленные для этого раунда предметы вернутся владельцам.
+        Чтобы закончить раунд с результатом — дождитесь таймера или
+        победы одной из сторон.
+      </p>
+
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="button button--secondary"
+          id="cancel-end-game"
+        >
+          Вернуться в игру
+        </button>
+
+        <button
+          type="button"
+          class="button button--danger"
+          id="confirm-end-game"
+        >
+          Отменить раунд
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       PATCH 0.6.5 — МОДАЛКА СБРОСА ПРОГРЕССА ИГРОКОВ
+  ========================================================== -->
+  <dialog
+    class="modal modal--danger"
+    id="reset-progress-modal"
+    aria-labelledby="reset-progress-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow panel__eyebrow--danger">
+            ОПАСНАЯ ОПЕРАЦИЯ
+          </p>
+
+          <h2 class="modal__title" id="reset-progress-title">
+            Сбросить весь прогресс?
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-reset-progress"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        У <strong>всех</strong> игроков будут обнулены:
+      </p>
+
+      <fieldset class="reset-mode">
+        <legend class="form-label">Что именно очистить</legend>
+
+        <label class="radio-card">
+          <input
+            type="radio"
+            name="reset-mode"
+            value="progress"
+            checked
+          >
+
+          <span class="radio-card__body">
+            <span class="radio-card__title">
+              Только прогресс
+            </span>
+
+            <span class="radio-card__description">
+              Балансы и гаджеты всех игроков обнулятся.
+              Имена останутся в списке.
+            </span>
+          </span>
+
+          <span class="radio-card__indicator" aria-hidden="true"></span>
+        </label>
+
+        <label class="radio-card">
+          <input
+            type="radio"
+            name="reset-mode"
+            value="players"
+          >
+
+          <span class="radio-card__body">
+            <span class="radio-card__title">
+              Удалить всех игроков
+            </span>
+
+            <span class="radio-card__description">
+              Полное удаление: имена, балансы, гаджеты, звания.
+              Список станет пустым.
+            </span>
+          </span>
+
+          <span class="radio-card__indicator" aria-hidden="true"></span>
+        </label>
+      </fieldset>
+
+      <p
+        class="modal__danger-note"
+        id="reset-progress-note"
+      >
+        ⚠ Это действие нельзя отменить. Имена игроков останутся в списке.
+      </p>
+
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="button button--secondary"
+          id="cancel-reset-progress"
+        >
+          Отмена
+        </button>
+
+        <button
+          type="button"
+          class="button button--danger"
+          id="confirm-reset-progress"
+        >
+          Да, сбросить
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+    <!-- =========================================================
+       PATCH 0.4.4 — МОДАЛЬНОЕ ОКНО: ПРАВИЛА ИГРЫ
+  ========================================================== -->
+  <dialog
+    class="modal"
+    id="rules-modal"
+    aria-labelledby="rules-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">CLASSIFIED // MANUAL</p>
+
+          <h2 class="modal__title" id="rules-title">
+            Правила игры
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-rules"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        Краткий гайд по механикам. Можно открыть в любой момент во время игры.
+      </p>
+
+      <details class="judging-accordion" open>
+        <summary>
+          <span>Цель игры</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Мирные знают локацию и свою роль. Шпионы — нет.<br>
+            <strong>Мирные побеждают</strong>, если вычислят всех
+            шпионов голосованием или все шпионы провалят перехват.<br>
+            <strong>Шпионы побеждают</strong>, если доживут до конца
+            таймера, успешно перехватят локацию или мирных останется
+            не больше, чем шпионов.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Как проходит раунд</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Устройство переходит по кругу, каждый игрок смотрит свою
+            роль тайно и запоминает <strong>личный код</strong>. Затем
+            запускается таймер. Игроки задают друг другу вопросы о
+            локации: мирные знают ответ, шпион — нет, он вынужден
+            притворяться и угадывать по вопросам.<br><br>
+
+            К таймеру добавляется скрытая случайная поправка
+            (до ±1 минуты), поэтому по стартовому времени нельзя
+            понять, у кого Глушитель или Допрос. Таймер считает по
+            часам: блокировка экрана его не растягивает.<br><br>
+
+            <strong>Отмена раунда</strong> (кнопка в игре или на
+            раздаче) ничего не начисляет и не списывает, а купленные
+            предметы возвращаются. Если страница перезагрузилась
+            посреди раунда, игра предложит продолжить (таймер встанет
+            на паузу) или отменить его.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Роли и личные коды</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            <strong>Мирные</strong> — знают локацию и роль в ней,
+            стараются вычислить шпионов.<br>
+            <strong>Шпион</strong> — не знает локацию, должен
+            притворяться, может попытаться угадать её (перехват)
+            и умеет пользоваться шпионскими гаджетами.<br><br>
+
+            У каждого игрока есть <strong>личный 4-значный код</strong>,
+            он показывается только на карте роли. Код нужен, чтобы
+            открыть перехват (только шпион) или применить
+            Верификатор. Любая ошибка выглядит одинаково —
+            «Код не принят», поэтому по ответу нельзя понять, кто
+            шпион. После трёх ошибок ввод блокируется на минуту.
+            Никому не называйте свой код.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Голосование</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Мирные могут обвинить кого-то. Нужно большинство голосов —
+            половина от активных + 1. Обязательно выбрать
+            <strong>инициатора</strong>: если обвинение верное,
+            его доля награды увеличивается. Подозреваемый не может
+            голосовать за самого себя.<br><br>
+
+            <strong>Если подозреваемый — шпион:</strong><br>
+            • Последний шпион — мирные побеждают. Инициатор получает
+            двойную долю банка.<br>
+            • Остались другие шпионы — игра продолжается. Инициатор
+            получает бонус к доле (+0,5), выгнанный шпион раскрывается.<br>
+            • У шпиона было Фальшивое удостоверение — оно сгорает,
+            шпион спасён, игра продолжается.<br><br>
+
+            <strong>Если подозреваемый — мирный:</strong> исключаются
+            оба — и подозреваемый, и инициатор. Их роли раскрываются.
+            Проголосовавшие получают пометку «неверный голос»: −15% к
+            доле выигрыша и +15% к доле проигрыша. Игра продолжается,
+            пока активных мирных больше, чем шпионов.<br><br>
+
+            Деньги за голосование выплачиваются <strong>один раз — в
+            конце раунда</strong>.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Перехват локации</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Каждый шпион может попробовать перехват
+            <strong>один раз за раунд</strong>. Он берёт телефон — все
+            это видят, — вводит свой личный код, выбирает локацию из
+            пула раунда и подтверждает.<br><br>
+
+            <strong>Отмены нет</strong> после подтверждения. Пока идёт
+            голосование, перехват недоступен.<br><br>
+
+            <strong>Успех:</strong> шпионы побеждают, а угадавший
+            получает двойную долю. Банк раунда умножается на
+            сложность пула: 0,25 за каждую локацию (от ×0,5 до ×2).
+            Чем больше локаций выбрано, тем выше награда за угадывание.<br><br>
+
+            <strong>Провал:</strong> шпион выбывает, его роль
+            раскрывается. Игра продолжается; остальные шпионы могут
+            попробовать сами. Результат перехвата виден всем.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Верификатор</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Гаджет, который проверяет роль любого игрока (включая
+            себя). Две версии:<br>
+            • <strong>Мирный Верификатор</strong> — 75% правда,
+            25% ложь.<br>
+            • <strong>Шпионский Верификатор</strong> — 75% ложь,
+            25% правда.<br><br>
+
+            <strong>Активация:</strong> в начале раунда у каждого
+            владельца подходящего Верификатора независимый шанс 30%
+            (TRNG). Неактивированный Верификатор не сгорает.<br><br>
+
+            <strong>Использование:</strong> одноразовое. Нужно ввести
+            личный код, затем выбрать игрока. Результат видят все.
+            Название окна нейтральное, а ошибки кода одинаковые, так
+            что со стороны нельзя понять, какой у игрока Верификатор.<br><br>
+
+            <strong>Верификатор — это информация, не приговор.</strong>
+            Голосование всё равно обязательно.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Гаджеты и магазин</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Кликните по имени игрока на экране настройки — откроется
+            магазин. <strong>Покупки скрыты</strong> от других игроков.<br><br>
+
+            <strong>Цены:</strong> Радар ур.1 — 50, Радар ур.2 — 90,
+            Глушитель — 30, Фальшивое удостоверение — 70,
+            Дополнительный допрос — 25, Страховка — 25,
+            Верификатор — 100. Покупки недоступны при отрицательном
+            балансе.<br><br>
+
+            Предмет активируется только если подходит роли. Если роль
+            не подошла — он замораживается до следующей игры.<br><br>
+
+            <strong>Радар:</strong> ур.1 оставляет примерно половину
+            пула, ур.2 — примерно треть (всегда меньше, чем ур.1,
+            минимум 2 варианта). Настоящая локация всегда среди них.<br><br>
+
+            <strong>Сгорание:</strong><br>
+            • Радар, Глушитель, Допрос — при активации в раунде.<br>
+            • Фальшивое удостоверение — при спасении от голосования.<br>
+            • <strong>Страховка — сгорает каждую игру</strong>,
+            даже если не сработала.<br>
+            • Верификатор — только если использован.<br>
+            • Если раунд отменён — всё, что сгорело при старте,
+            возвращается.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Экономика и ранги</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Баланс сохраняется между играми. Игра с <strong>нулевой
+            суммой</strong>: проигравшая команда платит «банк раунда»,
+            победившая его делит.<br><br>
+
+            • <strong>Банк раунда</strong> = 30 × число мирных
+            (не больше 240).<br>
+            • Доля победителя зависит от веса: обычный игрок — 1,
+            инициатор победного голосования — 2, угадавший локацию
+            шпион — 2, выгнанный шпион — 0,5. Неверные голоса
+            снижают долю мирного.<br>
+            • Проигравшие платят поровну (выгнанный шпион — 1,5
+            доли; мирные с неверными голосами платят больше).<br>
+            • <strong>Бонус за участие +15</strong> каждому игроку
+            за сыгранный раунд. Это единственный источник новых
+            монет, единственный расход — покупки.<br>
+            • Отменённый раунд ничего не меняет.<br><br>
+
+            <strong>Ранги:</strong><br>
+            • <strong>Должник Синдиката</strong> (баланс &lt; 0) —
+            покупки недоступны, 25% выигрыша уходит в счёт долга.<br>
+            • <strong>Элита МИ-6</strong> (баланс &gt; 500) —
+            скидка 10% на все покупки.<br>
+            • Минимальный баланс: −500.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Случайные события</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            С шансом 15% раунд начинается с одного из трёх событий:<br>
+            <strong>Кризис</strong> — банк раунда ×2.<br>
+            <strong>Охота за головами</strong> — инициатор
+            победного голосования дополнительно забирает до 50 коинов
+            у шпионов.<br>
+            <strong>Филантроп</strong> — самый бедный шпион
+            бесплатно получает радар 1 уровня.
+          </p>
+        </div>
+      </details>
+
+      <details class="judging-accordion">
+        <summary>
+          <span>Количество игроков и шпионов</span>
+          <span>⌄</span>
+        </summary>
+        <div class="judging-accordion__body">
+          <p class="judging-help">
+            Минимум 4 игрока и 5 локаций; лучше всего играется от
+            5–6 человек. Шпионов выбирает настройка: ровно 1 либо
+            случайно в диапазоне 1–25% / 1–50% от числа игроков,
+            но не больше, чем позволяет большинство голосов
+            (4 игрока — 1 шпион, 5–6 — до 2, 8 — до 3).<br>
+            Опция «Объявлять число шпионов» показывает на экране игры,
+            сколько шпионов в раунде и сколько осталось.
+          </p>
+        </div>
+      </details>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       PATCH 0.6.7 — МОДАЛКА: СТАТИСТИКА РАУНДОВ
+  ========================================================== -->
+  <dialog
+    class="modal modal--wide"
+    id="statistics-modal"
+    aria-labelledby="statistics-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">ARCHIVE // ROUND LOG</p>
+
+          <h2 class="modal__title" id="statistics-title">
+            Статистика раундов
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-statistics"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        История последних 50 раундов с ролями, балансом и голосованием.
+        <span class="counter-badge" id="statistics-count">0</span>
+      </p>
+
+      <div
+        class="statistics-list"
+        id="statistics-list"
+        aria-live="polite"
+      >
+        <!-- Раунды добавляются JavaScript -->
+      </div>
+
+      <div
+        class="empty-state"
+        id="statistics-empty"
+        hidden
+      >
+        <span class="empty-state__icon" aria-hidden="true">∅</span>
+        <p>Сыграйте первый раунд, чтобы увидеть статистику</p>
+      </div>
+
+      <div class="modal__actions modal__actions--single">
+        <button
+          type="button"
+          class="button button--danger"
+          id="statistics-clear"
+        >
+          Очистить историю
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       PATCH 0.6.7 — МОДАЛКА: ПОДТВЕРЖДЕНИЕ ОЧИСТКИ ИСТОРИИ
+  ========================================================== -->
+  <dialog
+    class="modal modal--danger"
+    id="statistics-clear-modal"
+    aria-labelledby="statistics-clear-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow panel__eyebrow--danger">
+            ОПАСНАЯ ОПЕРАЦИЯ
+          </p>
+
+          <h2 class="modal__title" id="statistics-clear-title">
+            Очистить всю историю?
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-statistics-clear"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        Все сохранённые раунды будут удалены без возможности
+        восстановления. Игроки, балансы и локации не затрагиваются.
+      </p>
+
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="button button--secondary"
+          id="cancel-statistics-clear"
+        >
+          Отмена
+        </button>
+
+        <button
+          type="button"
+          class="button button--danger"
+          id="confirm-statistics-clear"
+        >
+          Да, очистить
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       PATCH 0.6.7 — МОДАЛКА: ПОДТВЕРЖДЕНИЕ ПОЛНОГО ИМПОРТА
+  ========================================================== -->
+  <dialog
+    class="modal modal--danger"
+    id="import-full-backup-modal"
+    aria-labelledby="import-full-backup-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow panel__eyebrow--danger">
+            ПЕРЕЗАПИСЬ ДАННЫХ
+          </p>
+
+          <h2 class="modal__title" id="import-full-backup-title">
+            Импорт перезапишет всё
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-import-full-backup"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="modal__description">
+        Текущие игроки, балансы, гаджеты, кастомные локации,
+        выбранный пул, настройки и история раундов будут
+        заменены данными из файла.
+      </p>
+
+      <p
+        class="import-full-backup__summary"
+        id="import-full-backup-summary"
+      ></p>
+
+      <p class="modal__danger-note">
+        ⚠ Это действие нельзя отменить.
+      </p>
+
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="button button--secondary"
+          id="cancel-import-full-backup"
+        >
+          Отмена
+        </button>
+
+        <button
+          type="button"
+          class="button button--danger"
+          id="confirm-import-full-backup"
+        >
+          Заменить всё
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       PATCH 0.6.7 — МОДАЛКА: ДЕТАЛИ РАУНДА
+       Открывается кнопкой "?" в карточке статистики.
+  ========================================================== -->
+  <dialog
+    class="modal modal--wide"
+    id="round-detail-modal"
+    aria-labelledby="round-detail-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">ROUND REPORT // FULL LOG</p>
+
+          <h2 class="modal__title" id="round-detail-title">
+            Детали раунда
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="icon-button"
+          id="close-round-detail"
+          aria-label="Закрыть окно"
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        class="round-detail"
+        id="round-detail-body"
+        aria-live="polite"
+      >
+        <!-- Содержимое формируется JavaScript -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- =========================================================
+       ПРОДОЛЖЕНИЕ ПРЕРВАННОГО РАУНДА
+  ========================================================== -->
+  <dialog
+    class="modal modal--confirm"
+    id="resume-round-modal"
+    aria-labelledby="resume-round-title"
+  >
+    <div class="modal__content">
+      <div class="modal__header">
+        <div>
+          <p class="panel__eyebrow">СВЯЗЬ ВОССТАНОВЛЕНА</p>
+
+          <h2 class="modal__title" id="resume-round-title">
+            Найден незавершённый раунд
+          </h2>
+        </div>
+      </div>
+
+      <p class="modal__description" id="resume-round-summary"></p>
+
+      <p class="modal__description">
+        «Отменить» ничего не начисляет и не списывает, а купленные
+        предметы возвращаются владельцам.
+      </p>
+
+      <div class="modal__actions">
+        <button
+          type="button"
+          class="button button--secondary"
+          id="resume-round-cancel"
+        >
+          Отменить раунд
+        </button>
+
+        <button
+          type="button"
+          class="button button--primary"
+          id="resume-round-continue"
+        >
+          Продолжить
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Небольшое всплывающее уведомление -->
+  <div
+    class="toast"
+    id="toast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  ></div>
+
+  <!-- JavaScript приложения -->
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

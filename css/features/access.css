@@ -1,0 +1,259 @@
+/* =========================================================
+   css/features/access.css — v0.8.0
+   Ввод личного кода, код на карте роли, бейдж числа шпионов,
+   чекбокс-карточка, кнопки массового выбора локаций.
+========================================================= */
+@layer features {
+
+/* ---------- Окно ввода кода ---------- */
+
+.access-modal {
+  width: min(calc(100% - 28px), 360px);
+  padding: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-large);
+  background: var(--color-panel-strong);
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.64),
+    var(--shadow-primary);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.access-modal::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.access-modal__content {
+  padding: 24px 22px 22px;
+  text-align: center;
+}
+
+.access-modal__eyebrow {
+  margin-bottom: 8px;
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.access-modal__title {
+  color: var(--color-text);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+.access-modal__hint {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.access-dots {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 20px 0 8px;
+}
+
+.access-dot {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-text-dim);
+  border-radius: 50%;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.access-dot.is-filled {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  box-shadow: var(--shadow-primary);
+}
+
+.access-modal__status {
+  min-height: 18px;
+  margin: 0 0 12px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.access-modal__status.is-error {
+  color: var(--color-danger);
+}
+
+.access-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.access-key {
+  min-height: 54px;
+  color: var(--color-text);
+  border: 1px solid rgba(141, 164, 154, 0.22);
+  border-radius: var(--radius-medium);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  touch-action: manipulation;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.access-key:hover:not(:disabled) {
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+}
+
+.access-key:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.access-key:disabled {
+  opacity: 0.35;
+}
+
+.access-key--aux {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+/* ---------- Код на карте роли ---------- */
+
+.role-card__code {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.role-card__code:empty {
+  display: none;
+}
+
+.role-card__code-label {
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.role-card__code-value {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  padding-left: 0.3em;
+}
+
+/* ---------- Бейдж числа шпионов ---------- */
+
+.spy-badge {
+  padding: 6px 12px;
+  color: var(--color-danger);
+  border: 1px solid rgba(255, 95, 109, 0.4);
+  border-radius: 999px;
+  background: var(--color-danger-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.game-header {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ---------- Чекбокс-карточка ---------- */
+
+.checkbox-card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid rgba(141, 164, 154, 0.16);
+  border-radius: var(--radius-medium);
+  background: rgba(255, 255, 255, 0.022);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.checkbox-card:hover {
+  border-color: var(--color-border-strong);
+}
+
+.checkbox-card:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.checkbox-card input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-top: 2px;
+  accent-color: var(--color-primary);
+}
+
+.checkbox-card__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.checkbox-card__title {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.checkbox-card__description {
+  color: var(--color-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* ---------- Прочее ---------- */
+
+.locations-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.locations-bulk__label {
+  min-width: 96px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.field-hint--warning {
+  color: var(--color-orange);
+}
+
+#cancel-dealing {
+  margin-top: 10px;
+}
+
+} /* @layer features */
