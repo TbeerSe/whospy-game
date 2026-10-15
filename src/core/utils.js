@@ -122,10 +122,45 @@ export function shuffleArray(array, random) {
 
 /* ---------- Скачивание JSON-файла ----------
    Универсальная утилита: используется и для локаций, и для игроков.
-   На Android Chrome лучше работает через Blob + ObjectURL. */
-export function downloadJsonFile(filename, data) {
-  const json = JSON.stringify(data, null, 2);
+   В браузере — Blob + ObjectURL. В Android-приложении (Capacitor)
+   скачивание через <a download> не работает, поэтому файл пишется
+   в кэш приложения и открывается системное меню «Поделиться»
+   (оттуда можно сохранить в «Файлы», Google Drive и т.д.). */
+function isNativeApp() {
+  return Boolean(
+    window.Capacitor &&
+    typeof window.Capacitor.isNativePlatform === "function" &&
+    window.Capacitor.isNativePlatform()
+  );
+}
 
+let nativeFilesystem = null;
+let nativeShare = null;
+
+async function saveJsonNative(filename, json) {
+  if (!nativeFilesystem) {
+    nativeFilesystem = window.Capacitor.registerPlugin("Filesystem");
+  }
+
+  if (!nativeShare) {
+    nativeShare = window.Capacitor.registerPlugin("Share");
+  }
+
+  const written = await nativeFilesystem.writeFile({
+    path: filename,
+    data: json,
+    directory: "CACHE",
+    encoding: "utf8"
+  });
+
+  await nativeShare.share({
+    title: filename,
+    dialogTitle: "Сохранить файл",
+    url: written.uri
+  });
+}
+
+function downloadJsonInBrowser(filename, json) {
   try {
     const blob = new Blob(
       [json],
@@ -174,6 +209,28 @@ export function downloadJsonFile(filename, data) {
   }, 1000);
 
   return true;
+}
+
+export function downloadJsonFile(filename, data) {
+  const json = JSON.stringify(data, null, 2);
+
+  if (isNativeApp()) {
+    saveJsonNative(filename, json).catch((error) => {
+      // Пользователь закрыл меню «Поделиться» — это не ошибка.
+      const message = String((error && error.message) || error || "");
+
+      if (/cancel/i.test(message)) {
+        return;
+      }
+
+      console.warn("Native save failed, fallback to browser:", error);
+      downloadJsonInBrowser(filename, json);
+    });
+
+    return true;
+  }
+
+  return downloadJsonInBrowser(filename, json);
 }
 
 
