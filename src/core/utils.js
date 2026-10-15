@@ -134,26 +134,34 @@ function isNativeApp() {
   );
 }
 
-let nativeFilesystem = null;
-let nativeShare = null;
+function getNativePlugin(name) {
+  const cap = window.Capacitor;
+
+  // Нативный мост Capacitor кладёт плагины в Capacitor.Plugins,
+  // даже если @capacitor/core не подключён к странице.
+  if (cap.Plugins && cap.Plugins[name]) {
+    return cap.Plugins[name];
+  }
+
+  if (typeof cap.registerPlugin === "function") {
+    return cap.registerPlugin(name);
+  }
+
+  throw new Error("плагин " + name + " недоступен");
+}
 
 async function saveJsonNative(filename, json) {
-  if (!nativeFilesystem) {
-    nativeFilesystem = window.Capacitor.registerPlugin("Filesystem");
-  }
+  const filesystem = getNativePlugin("Filesystem");
+  const share = getNativePlugin("Share");
 
-  if (!nativeShare) {
-    nativeShare = window.Capacitor.registerPlugin("Share");
-  }
-
-  const written = await nativeFilesystem.writeFile({
+  const written = await filesystem.writeFile({
     path: filename,
     data: json,
     directory: "CACHE",
     encoding: "utf8"
   });
 
-  await nativeShare.share({
+  await share.share({
     title: filename,
     dialogTitle: "Сохранить файл",
     url: written.uri
