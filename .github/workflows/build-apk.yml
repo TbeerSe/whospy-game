@@ -29,7 +29,7 @@ jobs:
         working-directory: apk-build
         run: |
           npm init -y
-          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7
+          npm install @capacitor/core@7 @capacitor/cli@7 @capacitor/android@7 @capacitor/filesystem@7 @capacitor/share@7
           npx cap init "Шпион" com.tbeerse.whospy --web-dir www
           npx cap add android
           npx cap sync android
