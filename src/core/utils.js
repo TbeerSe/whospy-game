@@ -211,6 +211,10 @@ function downloadJsonInBrowser(filename, json) {
   return true;
 }
 
+function isAndroidWebView() {
+  return /; wv\)/.test(navigator.userAgent || "");
+}
+
 export function downloadJsonFile(filename, data) {
   const json = JSON.stringify(data, null, 2);
 
@@ -224,10 +228,18 @@ export function downloadJsonFile(filename, data) {
       }
 
       console.warn("Native save failed, fallback to browser:", error);
+      window.alert("Не удалось сохранить файл: " + message);
       downloadJsonInBrowser(filename, json);
     });
 
     return true;
+  }
+
+  if (isAndroidWebView()) {
+    window.alert(
+      "Диагностика: приложение запущено в WebView, " +
+      "но Capacitor не найден (window.Capacitor)."
+    );
   }
 
   return downloadJsonInBrowser(filename, json);
