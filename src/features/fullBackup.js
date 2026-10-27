@@ -92,6 +92,7 @@ export function exportFullBackup() {
     version: 1,
     exportedAt: new Date().toISOString(),
     players: collectPlayersPayload(),
+    spyStreaks: { ...state.spyStreaks },
     customLocations: collectCustomLocationsPayload(),
     selectedLocations: state.selectedLocations.map((loc) => ({
       name: String(loc.name || ""),
@@ -360,6 +361,16 @@ function applyFullBackupInternal(payload) {
   state.players = players;
   state.balances = balances;
   state.gadgets = gadgets;
+  state.spyStreaks = {};
+
+  if (payload.spyStreaks && typeof payload.spyStreaks === "object") {
+    players.forEach((player) => {
+      const streak = Math.floor(Number(payload.spyStreaks[player]));
+      if (Number.isFinite(streak) && streak > 0) {
+        state.spyStreaks[player] = Math.min(streak, 100);
+      }
+    });
+  }
 
   // 2. Кастомные локации
   const customLocations = [];
@@ -417,6 +428,7 @@ function applyFullBackupInternal(payload) {
   // 8. Запись в localStorage
   saveToStorage(STORAGE_KEYS.players, state.players);
   saveToStorage(STORAGE_KEYS.balances, state.balances);
+  saveToStorage(STORAGE_KEYS.spyStreaks, state.spyStreaks);
   saveGadgets();
   saveCustomLocations();
   saveSelectedLocations();

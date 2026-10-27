@@ -12,7 +12,11 @@
 // @ts-nocheck
 "use strict";
 
-import { state, pushRoundEvent } from "../core/state.js";
+import {
+  state,
+  pushRoundEvent,
+  INTERCEPT_WINDOW_SECONDS
+} from "../core/state.js";
 import { $, openDialog, closeDialog } from "../core/dom.js";
 import { escapeHtml, showToast } from "../core/utils.js";
 import { playTone } from "../core/audio.js";
@@ -39,6 +43,92 @@ function notifyInterceptFinished() {
   if (typeof onInterceptFinished === "function") {
     onInterceptFinished();
   }
+}
+
+/* =========================================================
+   15 секунд на выбор локации
+========================================================= */
+
+let interceptCountdownInterval = null;
+let interceptCountdownDeadline = 0;
+let interceptCountdownPlayer = "";
+let interceptLastSecond = null;
+
+function stopInterceptCountdown() {
+  if (interceptCountdownInterval !== null) {
+    window.clearInterval(interceptCountdownInterval);
+    interceptCountdownInterval = null;
+  }
+
+  interceptCountdownDeadline = 0;
+  interceptCountdownPlayer = "";
+  interceptLastSecond = null;
+}
+
+function renderInterceptCountdown(modal) {
+  if (state.gameEnded) {
+    stopInterceptCountdown();
+    if (modal.open) closeDialog(modal);
+    return;
+  }
+
+  const remaining = Math.max(
+    0,
+    Math.ceil((interceptCountdownDeadline - Date.now()) / 1000)
+  );
+
+  if (remaining !== interceptLastSecond) {
+    interceptLastSecond = remaining;
+
+    const value = modal.querySelector("[data-intercept-countdown-value]");
+    const ring = modal.querySelector("[data-intercept-countdown]");
+    const progress = Math.max(
+      0,
+      Math.min(100, (remaining / INTERCEPT_WINDOW_SECONDS) * 100)
+    );
+
+    if (value) value.textContent = String(remaining).padStart(2, "0");
+    if (ring) {
+      ring.style.setProperty("--intercept-progress", `${progress}%`);
+      ring.classList.toggle("is-danger", remaining <= 5);
+      ring.setAttribute("aria-label", `Осталось ${remaining} секунд`);
+    }
+  }
+
+  if (remaining <= 0) {
+    const player = interceptCountdownPlayer;
+    stopInterceptCountdown();
+    modal.dataset.selectedPlayer = "";
+    modal.dataset.selectedLocation = "";
+    closeDialog(modal);
+    executeIntercept(player, null, { timedOut: true });
+  }
+}
+
+function startInterceptCountdown(modal, player) {
+  stopInterceptCountdown();
+  interceptCountdownPlayer = player;
+  interceptCountdownDeadline = Date.now() + INTERCEPT_WINDOW_SECONDS * 1000;
+  renderInterceptCountdown(modal);
+  interceptCountdownInterval = window.setInterval(
+    () => renderInterceptCountdown(modal),
+    100
+  );
+}
+
+/* Общий таймер истёк, пока шпион был в окне выбора:
+   это провал перехвата, а не победа ожиданием. */
+export function expireActiveIntercept() {
+  const modal = $("#intercept-window-modal");
+  if (!modal?.open || !interceptCountdownPlayer) return false;
+
+  const player = interceptCountdownPlayer;
+  stopInterceptCountdown();
+  modal.dataset.selectedPlayer = "";
+  modal.dataset.selectedLocation = "";
+  closeDialog(modal);
+  executeIntercept(player, null, { timedOut: true });
+  return true;
 }
 
 /* =========================================================
@@ -117,6 +207,7 @@ export async function openInterceptWindow() {
   resetInterceptModal(modal, assignment.player);
 
   openDialog(modal);
+  startInterceptCountdown(modal, assignment.player);
 }
 
 /* =========================================================
@@ -194,6 +285,21 @@ function createInterceptWindowModal() {
         Выбор увидят все, кто смотрит на экран.
       </p>
 
+      <div
+        class="intercept-window__countdown"
+        data-intercept-countdown
+        role="timer"
+        aria-live="off"
+      >
+        <span class="intercept-window__countdown-ring" aria-hidden="true">
+          <strong data-intercept-countdown-value>15</strong>
+        </span>
+        <span class="intercept-window__countdown-copy">
+          <strong>Решение за 15 секунд</strong>
+          <span>Не успеете подтвердить — перехват провален.</span>
+        </span>
+      </div>
+
       <h3 class="intercept-window__section-title">
         Какая локация
       </h3>
@@ -201,26 +307,17 @@ function createInterceptWindowModal() {
       <div class="intercept-window__locations judging-location-list"></div>
 
       <p class="intercept-window__warning">
-        Отмены нет. После подтверждения выбор финален.
-        Провал — выбывание из раунда.
+        Выбор финален. Ошибка или истечение времени — выбывание из раунда.
       </p>
 
       <div class="intercept-window-modal__actions">
         <button
           type="button"
-          class="button button--secondary"
-          data-intercept-cancel
-        >
-          Отмена
-        </button>
-
-        <button
-          type="button"
-          class="button button--danger"
+          class="button button--danger button--full"
           data-intercept-confirm
           disabled
         >
-          Проверить
+          Подтвердить перехват
         </button>
       </div>
     </div>
@@ -228,16 +325,14 @@ function createInterceptWindowModal() {
 
   document.body.appendChild(modal);
 
-  modal.addEventListener("click", (event) => {
-    if (
-      event.target === modal ||
-      event.target.closest("[data-intercept-cancel]")
-    ) {
-      modal.dataset.selectedPlayer = "";
-      closeDialog(modal);
-      return;
-    }
+  modal.addEventListener("cancel", (event) => {
+    // Escape не должен давать второй отсчёт или паузу для ожидания.
+    event.preventDefault();
+  });
 
+  modal.addEventListener("close", stopInterceptCountdown);
+
+  modal.addEventListener("click", (event) => {
     const locationBtn = event.target.closest(
       "[data-intercept-location]"
     );
@@ -283,10 +378,14 @@ function createInterceptWindowModal() {
    Выполнение перехвата
 ========================================================= */
 
-function executeIntercept(player, location) {
+function executeIntercept(player, location, options = {}) {
+  stopInterceptCountdown();
+
+  const timedOut = options.timedOut === true;
+
   if (state.gameEnded) return;
   if (state.interceptInProgress) return;
-  if (!player || !location) return;
+  if (!player || (!location && !timedOut)) return;
 
   if (!isInterceptAvailable(player)) return;
 
@@ -299,7 +398,7 @@ function executeIntercept(player, location) {
   state.interceptAttempts.add(player);
   state.interceptInProgress = true;
 
-  const isCorrect = location === state.currentRoundLocation;
+  const isCorrect = !timedOut && location === state.currentRoundLocation;
   const priorFailures = state.priorInterceptFailures;
 
   if (isCorrect) {
@@ -328,15 +427,16 @@ function executeIntercept(player, location) {
 
   state.interceptResults.push({
     player,
-    location,
+    location: timedOut ? null : location,
     success: false,
+    reason: timedOut ? "timeout" : "wrong-location",
     priorFailures,
     reward: 0
   });
 
-  pushRoundEvent("intercept_failure", {
+  pushRoundEvent(timedOut ? "intercept_timeout" : "intercept_failure", {
     player,
-    location,
+    location: timedOut ? null : location,
     priorFailures
   });
 
@@ -348,8 +448,9 @@ function executeIntercept(player, location) {
   flashScreen("red");
 
   showToast(
-    `${player} провалил перехват и выбывает. ` +
-    `Локация скрыта.`
+    timedOut
+      ? `${player} не уложился в 15 секунд и выбывает. Локация скрыта.`
+      : `${player} провалил перехват и выбывает. Локация скрыта.`
   );
 
   state.interceptInProgress = false;

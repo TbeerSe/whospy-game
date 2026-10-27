@@ -256,16 +256,16 @@ async function status(page) {
     await openIntercept(page);
     await H.typeCode(page, codeBefore);
     check("код после восстановления принимается", !!(await page.waitForSelector("#intercept-window-modal[open]", { timeout: 3000 }).catch(() => null)));
-    await page.click("[data-intercept-cancel]");
-    // перезагрузка и отмена
+    const currentLocation = await H.stateOf(page, "state.currentRoundLocation");
+    await page.click(`[data-intercept-location="${currentLocation}"]`);
+    await page.click("[data-intercept-confirm]");
+    await page.waitForTimeout(250);
+    check("перехват после восстановления завершает раунд", await H.stateOf(page, "state.gameEnded"));
+    // Завершённый раунд больше не предлагается к восстановлению.
     await page.reload();
-    await page.waitForSelector("#resume-round-modal[open]");
-    await click(page, "#resume-round-cancel");
     await page.waitForSelector("#settings-screen.is-active");
-    check("после отмены снимка нет", await page.evaluate(() => localStorage.getItem("spyfall_active_round") === null));
-    await page.reload();
-    await page.waitForSelector("#settings-screen.is-active");
-    check("после повторной загрузки окна нет", !(await page.$("#resume-round-modal[open]")));
+    check("после завершения окна восстановления нет", !(await page.$("#resume-round-modal[open]")));
+    check("после завершения снимка нет", await page.evaluate(() => localStorage.getItem("spyfall_active_round") === null));
     check("ошибок страницы нет", t.errors.length === 0, t.errors);
     await t.browser.close();
   }

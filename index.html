@@ -76,7 +76,7 @@
           aria-label="Статистика раундов"
           title="Статистика раундов"
         >
-          <span class="header-actions__icon" aria-hidden="true">📊</span>
+          <span class="header-actions__icon" aria-hidden="true">▦</span>
           <span class="header-actions__label">Статистика</span>
         </button>
 
@@ -87,7 +87,7 @@
           aria-label="Экспорт всех данных"
           title="Скачать резервную копию"
         >
-          <span class="header-actions__icon" aria-hidden="true">📥</span>
+          <span class="header-actions__icon" aria-hidden="true">↓</span>
           <span class="header-actions__label">Экспорт</span>
         </button>
 
@@ -98,7 +98,7 @@
           aria-label="Импорт данных из файла"
           title="Загрузить резервную копию"
         >
-          <span class="header-actions__icon" aria-hidden="true">📁</span>
+          <span class="header-actions__icon" aria-hidden="true">↑</span>
           <span class="header-actions__label">Импорт</span>
         </button>
 
@@ -143,6 +143,12 @@
             Добавьте участников, выберите локации и настройте правила
             секретной операции.
           </p>
+
+          <div class="mission-brief" aria-label="Формат игры">
+            <span><b>4+</b> агентов</span>
+            <span><b>1</b> устройство</span>
+            <span><b>5–60</b> минут</span>
+          </div>
         </div>
 
         <div class="settings-layout">
@@ -164,7 +170,7 @@
                 id="export-players"
                 title="Скачать список игроков и их балансы"
               >
-                📥 Скачать игроков
+                ↓ Скачать игроков
               </button>
 
               <button
@@ -173,7 +179,7 @@
                 id="import-players"
                 title="Загрузить список игроков из JSON"
               >
-                📁 Загрузить игроков
+                ↑ Загрузить игроков
               </button>
 
               <button
@@ -182,7 +188,7 @@
                 id="reset-players-progress"
                 title="Обнулить балансы и гаджеты всех игроков"
               >
-                🔄 Сбросить прогресс
+                ↺ Сбросить прогресс
               </button>
 
               <input
@@ -310,7 +316,8 @@
                 </select>
 
                 <p class="field-hint">
-                  Число будет автоматически ограничено количеством игроков.
+                  После роли шпиона шанс на её повтор снижается на 25% за
+                  каждый раунд серии. Раунд в мирной роли сбрасывает серию.
                 </p>
               </div>
             </div>
@@ -798,7 +805,7 @@
           id="example-custom-packs"
           title="Скачать пример JSON-файла"
         >
-          📄 Пример
+          ◇ Пример
         </button>
 
         <button
@@ -806,7 +813,7 @@
           class="button button--ghost button--small"
           id="import-custom-packs"
         >
-          📁 Загрузить из файла
+          ↑ Загрузить из файла
         </button>
 
         <button
@@ -815,7 +822,7 @@
           id="export-custom-packs"
           title="Скачать все кастомные локации"
         >
-          📥 Скачать JSON
+          ↓ Скачать JSON
         </button>
 
         <input
@@ -1226,8 +1233,9 @@
             это видят, — вводит свой личный код, выбирает локацию из
             пула раунда и подтверждает.<br><br>
 
-            <strong>Отмены нет</strong> после подтверждения. Пока идёт
-            голосование, перехват недоступен.<br><br>
+            После ввода кода на выбор и подтверждение есть
+            <strong>15 секунд</strong>. Окно нельзя закрыть, чтобы переждать
+            таймер раунда. Если время выйдет — это провал перехвата.<br><br>
 
             <strong>Успех:</strong> шпионы побеждают, а угадавший
             получает двойную долю. Банк раунда умножается на
@@ -1370,7 +1378,10 @@
             но не больше, чем позволяет большинство голосов
             (4 игрока — 1 шпион, 5–6 — до 2, 8 — до 3).<br>
             Опция «Объявлять число шпионов» показывает на экране игры,
-            сколько шпионов в раунде и сколько осталось.
+            сколько шпионов в раунде и сколько осталось.<br><br>
+            После каждой завершённой роли шпиона вес игрока в следующем
+            розыгрыше снижается на 25%; при длинной серии скидка накапливается.
+            Завершённый раунд в мирной роли сбрасывает серию.
           </p>
         </div>
       </details>

@@ -8,7 +8,7 @@
 ========================================================= */
 "use strict";
 
-const CACHE_NAME = "whospy-v0.8.5";
+const CACHE_NAME = "whospy-v0.9.0";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {

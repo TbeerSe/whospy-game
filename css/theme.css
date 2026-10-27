@@ -1,0 +1,579 @@
+/* =========================================================
+   Финальная арт-дирекция: полевой терминал спецслужбы.
+   Спокойный графит, мятный сигнал и янтарные пометки досье.
+========================================================= */
+
+:root {
+  --color-bg: #070b0e;
+  --color-bg-soft: #0b1216;
+  --color-panel: rgba(15, 23, 28, 0.9);
+  --color-panel-strong: rgba(17, 26, 32, 0.98);
+  --color-border: rgba(188, 216, 207, 0.11);
+  --color-border-strong: rgba(124, 231, 193, 0.38);
+  --color-text: #f1f5f3;
+  --color-text-muted: #a1b0ac;
+  --color-text-dim: #758680;
+  --color-primary: #7ce7c1;
+  --color-primary-soft: rgba(124, 231, 193, 0.1);
+  --color-primary-dark: #2c9c79;
+  --color-orange: #efb66c;
+  --color-orange-soft: rgba(239, 182, 108, 0.1);
+  --color-danger: #ff7185;
+  --color-danger-soft: rgba(255, 113, 133, 0.1);
+  --shadow-panel: 0 22px 60px rgba(0, 0, 0, 0.28);
+  --shadow-primary: 0 8px 24px rgba(59, 193, 150, 0.13);
+  --radius-small: 10px;
+  --radius-medium: 14px;
+  --radius-large: 20px;
+}
+
+html {
+  background: var(--color-bg);
+}
+
+body {
+  background:
+    radial-gradient(circle at 14% -8%, rgba(68, 145, 129, 0.14), transparent 32rem),
+    radial-gradient(circle at 96% 42%, rgba(167, 117, 62, 0.06), transparent 28rem),
+    linear-gradient(180deg, #080d11 0%, #070b0e 65%, #06090c 100%);
+}
+
+.background-grid {
+  opacity: 0.17;
+  background-size: 40px 40px;
+}
+
+.background-glow {
+  opacity: 0.055;
+  filter: blur(100px);
+}
+
+/* Типографика: без пиксельного начертания у основных заголовков. */
+.screen-title,
+.panel__title,
+.modal__title,
+.player-turn-card__name,
+.role-card__title,
+.game-result__title,
+.intercept-window-modal__title,
+.confirm-intercept-modal__title,
+.equipment-shop-modal__title {
+  font-family: var(--font-sans);
+}
+
+.screen-title {
+  margin-top: 10px;
+  font-weight: 760;
+  letter-spacing: -0.045em;
+}
+
+.screen-description {
+  line-height: 1.65;
+}
+
+.section-kicker,
+.panel__eyebrow,
+.brand__eyebrow {
+  color: #8bd7bd;
+  letter-spacing: 0.16em;
+}
+
+/* Шапка */
+.app-header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(188, 216, 207, 0.08);
+}
+
+.brand__mark {
+  color: #07120e;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(145deg, #a0efd3, #62cda8);
+  box-shadow: 0 8px 24px rgba(70, 190, 150, 0.16);
+  font-family: var(--font-sans);
+  font-size: 24px;
+  font-weight: 800;
+  transform: rotate(-7deg);
+}
+
+.brand__title {
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-actions .button,
+.sound-toggle {
+  border-color: rgba(188, 216, 207, 0.12);
+  background: rgba(255, 255, 255, 0.025);
+  box-shadow: none;
+}
+
+.header-actions .button:hover,
+.sound-toggle:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-primary-soft);
+  box-shadow: none;
+}
+
+.header-actions__icon {
+  display: inline-grid;
+  min-width: 14px;
+  place-items: center;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+/* Вводная плашка миссии */
+.screen-heading {
+  position: relative;
+  padding-left: 18px;
+}
+
+.screen-heading::before {
+  position: absolute;
+  top: 3px;
+  bottom: 4px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(var(--color-primary), rgba(124, 231, 193, 0.06));
+  content: "";
+}
+
+.mission-brief {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.mission-brief > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 6px 10px;
+  color: var(--color-text-muted);
+  border: 1px solid rgba(188, 216, 207, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.025);
+  font-size: 11px;
+}
+
+.mission-brief b {
+  color: var(--color-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+/* Панели и карточки */
+.panel,
+.modal,
+.intercept-window-modal,
+.confirm-intercept-modal {
+  border-color: var(--color-border);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.025), transparent 42%),
+    var(--color-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.panel::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 16px;
+  left: 16px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(124, 231, 193, 0.26), transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.panel__header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(188, 216, 207, 0.075);
+}
+
+.panel__title {
+  font-size: 20px;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+}
+
+.panel__icon {
+  text-shadow: none;
+}
+
+.counter-badge {
+  border-color: rgba(124, 231, 193, 0.25);
+  background: rgba(124, 231, 193, 0.08);
+  box-shadow: none;
+}
+
+.player-item,
+.location-card,
+.radio-card,
+.custom-pack-item {
+  border-color: rgba(188, 216, 207, 0.1);
+  background: rgba(255, 255, 255, 0.022);
+}
+
+.player-item {
+  padding: 10px 11px;
+}
+
+.player-item__number {
+  border: 1px solid rgba(124, 231, 193, 0.12);
+  background: rgba(124, 231, 193, 0.065);
+}
+
+.player-item__rank {
+  color: #93a49f;
+  border-color: rgba(188, 216, 207, 0.12);
+  font-family: var(--font-sans);
+  font-size: 8px;
+  letter-spacing: 0.055em;
+}
+
+.player-item__balance {
+  color: var(--color-orange);
+}
+
+.location-card {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.018);
+}
+
+.location-card:hover {
+  border-color: rgba(124, 231, 193, 0.3);
+  background: rgba(124, 231, 193, 0.055);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.location-card.is-selected {
+  border-color: rgba(124, 231, 193, 0.52);
+  background: linear-gradient(145deg, rgba(124, 231, 193, 0.12), rgba(124, 231, 193, 0.055));
+  box-shadow: inset 0 0 0 1px rgba(124, 231, 193, 0.07);
+}
+
+.location-card__check {
+  color: #07120e;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.location-card__roles {
+  color: #81928c;
+}
+
+.location-tab {
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+}
+
+.location-tab.is-active {
+  border-color: rgba(124, 231, 193, 0.26);
+}
+
+.empty-state {
+  background: rgba(255, 255, 255, 0.012);
+}
+
+/* Поля и кнопки */
+.text-input,
+.select-input,
+.textarea-input {
+  border-color: rgba(188, 216, 207, 0.14);
+  background-color: rgba(3, 8, 10, 0.34);
+}
+
+.text-input:hover,
+.select-input:hover,
+.textarea-input:hover,
+.text-input:focus,
+.select-input:focus,
+.textarea-input:focus {
+  border-color: rgba(124, 231, 193, 0.45);
+  background-color: rgba(3, 8, 10, 0.5);
+  box-shadow: 0 0 0 3px rgba(124, 231, 193, 0.07);
+}
+
+.select-input option {
+  background: #111a20;
+}
+
+.button {
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.button--primary {
+  color: #07140f;
+  background: linear-gradient(135deg, #91edcc, #68d6af);
+  box-shadow: 0 9px 25px rgba(58, 183, 141, 0.17);
+}
+
+.button--primary:hover {
+  background: linear-gradient(135deg, #adf4db, #79e2bc);
+  box-shadow: 0 12px 30px rgba(58, 183, 141, 0.23);
+}
+
+.button--secondary {
+  color: #9cebd0;
+  border-color: rgba(124, 231, 193, 0.25);
+  background: rgba(124, 231, 193, 0.075);
+  box-shadow: none;
+}
+
+.button--secondary:hover {
+  background: rgba(124, 231, 193, 0.13);
+  box-shadow: none;
+}
+
+.button--ghost {
+  border-color: rgba(188, 216, 207, 0.12);
+}
+
+.button--danger {
+  border-color: rgba(255, 113, 133, 0.26);
+  background: rgba(255, 113, 133, 0.075);
+}
+
+.settings-actions {
+  padding: 12px;
+  border: 1px solid rgba(124, 231, 193, 0.13);
+  border-radius: 16px;
+  background: rgba(10, 17, 20, 0.88);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(18px);
+}
+
+/* Раздача и досье */
+.player-turn-card {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(124, 231, 193, 0.09), transparent 50%),
+    var(--color-panel);
+}
+
+.role-card {
+  border-color: rgba(239, 182, 108, 0.28);
+  background:
+    linear-gradient(145deg, rgba(77, 57, 32, 0.34), transparent 48%),
+    var(--color-panel);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.role-card__icon {
+  box-shadow: none;
+}
+
+.role-card__description,
+.player-turn-card__instruction {
+  line-height: 1.65;
+}
+
+/* Игровой таймер */
+.timer-panel {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(124, 231, 193, 0.075), transparent 46%),
+    var(--color-panel);
+}
+
+.game-timer {
+  font-family: var(--font-sans);
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.065em;
+  text-shadow: 0 0 32px rgba(124, 231, 193, 0.18);
+}
+
+.timer-progress {
+  height: 4px;
+  background: rgba(124, 231, 193, 0.09);
+}
+
+.timer-progress span {
+  box-shadow: none;
+}
+
+.judging-accordion {
+  border-color: rgba(188, 216, 207, 0.1);
+  background: rgba(15, 23, 28, 0.88);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.16);
+}
+
+.judging-accordion[open] {
+  border-color: rgba(124, 231, 193, 0.26);
+  background: rgba(17, 27, 31, 0.96);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+}
+
+.judging-accordion summary::after {
+  border-radius: 8px;
+  background: rgba(124, 231, 193, 0.06);
+}
+
+.judging-player-button,
+.judging-location-button {
+  border-color: rgba(188, 216, 207, 0.13);
+}
+
+.judging-location-button {
+  color: #a3dcd0;
+  border-color: rgba(124, 231, 193, 0.17);
+  background: rgba(124, 231, 193, 0.045);
+}
+
+/* Перехват: единственный намеренно тревожный экран. */
+.intercept-window-modal {
+  border-color: rgba(255, 113, 133, 0.32);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 113, 133, 0.1), transparent 40%),
+    var(--color-panel-strong);
+}
+
+.intercept-window__countdown-ring::before {
+  background: #131b20;
+}
+
+.intercept-window-modal__content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.intercept-window__locations {
+  flex: 1 1 auto;
+  min-height: 120px;
+  align-content: start;
+  overflow-y: auto;
+  padding: 2px 4px 2px 2px;
+}
+
+.intercept-window__warning {
+  flex: 0 0 auto;
+  margin-top: 14px;
+}
+
+.intercept-window-modal__actions {
+  flex: 0 0 auto;
+  margin-top: 12px;
+  padding-top: 2px;
+  background: var(--color-panel-strong);
+}
+
+.intercept-window__warning {
+  border-left-width: 3px;
+  background: rgba(255, 113, 133, 0.07);
+}
+
+.intercept-window-modal__actions {
+  grid-template-columns: 1fr;
+}
+
+/* Модальные окна */
+.modal::backdrop,
+.intercept-window-modal::backdrop,
+.confirm-intercept-modal::backdrop {
+  background: rgba(2, 5, 7, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.toast {
+  border-color: rgba(124, 231, 193, 0.28);
+  background: rgba(15, 26, 29, 0.97);
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.42);
+}
+
+/* Тонкие скроллбары не спорят с интерфейсом. */
+* {
+  scrollbar-color: rgba(124, 231, 193, 0.24) transparent;
+  scrollbar-width: thin;
+}
+
+@media (min-width: 960px) {
+  .settings-layout {
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+    gap: 20px;
+  }
+
+  .app-header {
+    margin-bottom: 42px;
+  }
+
+  .settings-actions {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    padding-bottom: 14px;
+  }
+
+  .screen--settings {
+    padding-bottom: 86px;
+  }
+
+  .screen--settings .settings-actions {
+    position: fixed;
+    z-index: 15;
+    right: 12px;
+    bottom: max(10px, env(safe-area-inset-bottom));
+    left: 12px;
+    display: grid;
+    margin: 0;
+    padding: 8px;
+    border-radius: 15px;
+  }
+
+  .screen--settings .settings-actions .button {
+    width: 100%;
+    min-height: 52px;
+  }
+
+  .screen--settings .settings-actions .validation-message:not(:empty) {
+    padding: 2px 6px 6px;
+    text-align: center;
+  }
+
+  .mission-brief {
+    gap: 6px;
+    margin-top: 15px;
+  }
+
+  .mission-brief > span {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+
+  .panel__header {
+    margin-bottom: 17px;
+    padding-bottom: 14px;
+  }
+}
+
+@media (max-width: 420px) {
+  .screen-heading {
+    padding-left: 14px;
+  }
+
+  .intercept-window__countdown {
+    gap: 11px;
+    padding: 10px 11px;
+  }
+
+  .intercept-window__countdown-ring {
+    width: 52px;
+    height: 52px;
+    flex-basis: 52px;
+  }
+}

@@ -6,7 +6,11 @@
 // @ts-nocheck
 "use strict";
 
-import { state } from "../core/state.js";
+import {
+  state,
+  SPY_REPEAT_WEIGHT_STEP,
+  SPY_REPEAT_MIN_WEIGHT
+} from "../core/state.js";
 import {
   shuffleArray,
   createCryptoRandom
@@ -50,6 +54,48 @@ export function getSpiesCount(playerCount, setting, random) {
   const capped = Math.min(maximum, maxSpies);
 
   return 1 + Math.floor(random() * capped);
+}
+
+/* ---------- Мягкая ротация шпионов ----------
+   Вес — не итоговая вероятность: при взвешенном розыгрыше она зависит
+   и от весов остальных игроков. Минимум сохраняет шанс каждому. */
+export function getSpySelectionWeight(player, streaks = state.spyStreaks) {
+  const streak = Math.max(0, Math.floor(Number(streaks?.[player]) || 0));
+  return Math.max(
+    SPY_REPEAT_MIN_WEIGHT,
+    1 - streak * SPY_REPEAT_WEIGHT_STEP
+  );
+}
+
+export function selectWeightedSpyIndexes(
+  assignments,
+  count,
+  random,
+  streaks = state.spyStreaks
+) {
+  const candidates = assignments.map((assignment, index) => ({
+    index,
+    weight: getSpySelectionWeight(assignment.player, streaks)
+  }));
+  const selected = [];
+
+  while (selected.length < count && candidates.length) {
+    const totalWeight = candidates.reduce((sum, item) => sum + item.weight, 0);
+    let cursor = random() * totalWeight;
+    let picked = candidates.length - 1;
+
+    for (let index = 0; index < candidates.length; index += 1) {
+      cursor -= candidates[index].weight;
+      if (cursor < 0) {
+        picked = index;
+        break;
+      }
+    }
+
+    selected.push(candidates.splice(picked, 1)[0].index);
+  }
+
+  return selected;
 }
 
 /* ---------- Создание распределения ролей ----------
@@ -98,12 +144,11 @@ export function createAssignments(entropy, randomSource) {
     accessCode: codes[index]
   }));
 
-  const availableIndexes = shuffleArray(
-    assignments.map((_, index) => index),
+  const spyIndexes = selectWeightedSpyIndexes(
+    assignments,
+    spiesCount,
     random
   );
-
-  const spyIndexes = availableIndexes.slice(0, spiesCount);
 
   spyIndexes.forEach((index) => {
     assignments[index].roleType = "spy";

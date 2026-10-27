@@ -1,7 +1,7 @@
 /* =========================================================
    main.js — точка входа приложения
-   v0.8.5 — нулевая сумма экономики, отмена голосования, кэп таймера
-   (до этого: v0.8.4 — криптослучайность ролей, PWA, блокировка кодов)
+   v0.9.0 — мягкая ротация шпионов, лимит перехвата, новый интерфейс
+   (до этого: v0.8.5 — нулевая сумма экономики и кэп таймера)
 ========================================================= */
 // @ts-nocheck
 "use strict";
@@ -11,6 +11,7 @@ import { showScreen } from "./core/dom.js";
 import {
   loadSettings,
   loadRoundHistory,
+  loadSpyStreaks,
   saveToStorage
 } from "./core/storage.js";
 import { toggleSound, initAudioLifecycle } from "./core/audio.js";
@@ -46,7 +47,10 @@ import { offerResumeIfNeeded } from "./features/resume.js";
 // PATCH 0.7.0 — перехват перерисовывает интерфейс судейства
 // через колбэк, чтобы не было циклического импорта
 // intercept.js → judging.js → intercept.js.
-import { setOnInterceptFinished } from "./features/intercept.js";
+import {
+  setOnInterceptFinished,
+  expireActiveIntercept
+} from "./features/intercept.js";
 import { setOnVerificatorUsed } from "./features/verificator.js";
 import { renderJudgingInterface } from "./features/judging.js";
 
@@ -88,6 +92,7 @@ async function init() {
   loadSettings();
   loadSelectedLocations();
   loadRoundHistory();
+  loadSpyStreaks();
 
   renderDefaultLocations();
   renderCustomLocations();
@@ -115,7 +120,13 @@ async function init() {
   setupSoundToggle();
 
   // 6. Разрываем цикл timer → rounds через колбэк.
-  setOnTimerExpired(() => finishTimer());
+  // Если общий таймер истёк во время перехвата, шпион проигрывает
+  // попытку, а не получает победу ожиданием в открытом окне.
+  setOnTimerExpired(() => {
+    if (!expireActiveIntercept()) {
+      finishTimer();
+    }
+  });
 
   // 7. PATCH 0.7.0 — разрываем цикл intercept → judging.
   // После завершения перехвата (успех/провал/отказ) нужно

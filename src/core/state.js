@@ -17,8 +17,16 @@ export const STORAGE_KEYS = {
   // PATCH 0.6.7 — история сыгранных раундов
   roundHistory: "spyfall_round_history",
   // Снимок активного раунда — для восстановления после перезагрузки.
-  activeRound: "spyfall_active_round"
+  activeRound: "spyfall_active_round",
+  spyStreaks: "spyfall_spy_streaks"
 };
+
+/* ---------- Ротация роли шпиона ----------
+   После каждой завершённой роли шпиона вес игрока при следующем
+   розыгрыше уменьшается на 25%. Раунд без этой роли сбрасывает серию. */
+export const SPY_REPEAT_WEIGHT_STEP = 0.25;
+export const SPY_REPEAT_MIN_WEIGHT = 0.1;
+export const INTERCEPT_WINDOW_SECONDS = 15;
 
 /* ---------- Экономика ----------
    Все расчёты по итогам раунда делает economy.settleRound().
@@ -147,6 +155,8 @@ export const state = {
 
   balances: {},
   gadgets: {},
+  // Серии завершённых раундов в роли шпиона: { playerName: count }.
+  spyStreaks: {},
   activeGadgets: {},
 
   pendingEvent: null,

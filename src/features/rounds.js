@@ -443,7 +443,9 @@ async function revealAllRolesAtEnd(outcome = "timeout") {
     if (interceptResult && !interceptResult.success) {
       interceptHtml =
         '<span class="end-role-badge__intercept end-role-badge__intercept--fail">' +
-          "📡 перехват провален" +
+          (interceptResult.reason === "timeout"
+            ? "⏱ время перехвата вышло"
+            : "📡 перехват провален") +
         "</span>";
     } else if (interceptResult && interceptResult.success) {
       interceptHtml =

@@ -61,6 +61,52 @@ export function readFromStorage(key, fallback) {
 }
 
 /* =========================================================
+   Ротация шпионов
+========================================================= */
+
+export function loadSpyStreaks() {
+  const saved = readFromStorage(STORAGE_KEYS.spyStreaks, {});
+  const knownPlayers = new Set(state.players);
+  const streaks = {};
+
+  if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+    Object.entries(saved).forEach(([player, value]) => {
+      const streak = Math.floor(Number(value));
+      if (knownPlayers.has(player) && Number.isFinite(streak) && streak > 0) {
+        streaks[player] = Math.min(streak, 100);
+      }
+    });
+  }
+
+  state.spyStreaks = streaks;
+  return state.spyStreaks;
+}
+
+export function saveSpyStreaks() {
+  saveToStorage(STORAGE_KEYS.spyStreaks, state.spyStreaks);
+}
+
+/* Вызывается только после завершённого раунда, не после отмены. */
+export function updateSpyStreaks(assignments) {
+  const spies = new Set(
+    (Array.isArray(assignments) ? assignments : [])
+      .filter((assignment) => assignment?.roleType === "spy")
+      .map((assignment) => assignment.player)
+  );
+  const next = {};
+
+  state.players.forEach((player) => {
+    if (spies.has(player)) {
+      const previous = Math.max(0, Number(state.spyStreaks[player]) || 0);
+      next[player] = Math.min(100, previous + 1);
+    }
+  });
+
+  state.spyStreaks = next;
+  saveSpyStreaks();
+}
+
+/* =========================================================
    Настройки
 ========================================================= */
 

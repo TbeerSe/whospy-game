@@ -351,8 +351,10 @@ export function resetAllPlayerProgress() {
     state.balances[player] = 0;
     state.gadgets[player] = createEmptyInventory();
   });
+  state.spyStreaks = {};
 
   savePlayers();
+  saveToStorage(STORAGE_KEYS.spyStreaks, state.spyStreaks);
   saveGadgets();
   saveToStorage(STORAGE_KEYS.balances, state.balances);
 
@@ -376,8 +378,10 @@ export function deleteAllPlayers() {
   state.players = [];
   state.balances = {};
   state.gadgets = {};
+  state.spyStreaks = {};
 
   savePlayers();
+  saveToStorage(STORAGE_KEYS.spyStreaks, state.spyStreaks);
   saveToStorage(STORAGE_KEYS.balances, state.balances);
   saveGadgets();
   renderPlayers();

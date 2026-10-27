@@ -69,6 +69,71 @@
   line-height: 1.55;
 }
 
+.intercept-window__countdown {
+  --countdown-color: var(--color-orange);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 154, 74, 0.25);
+  border-radius: var(--radius-medium);
+  background: rgba(255, 154, 74, 0.07);
+}
+
+.intercept-window__countdown.is-danger {
+  --countdown-color: var(--color-danger);
+  border-color: rgba(255, 95, 109, 0.45);
+  background: var(--color-danger-soft);
+}
+
+.intercept-window__countdown-ring {
+  position: relative;
+  display: grid;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  place-items: center;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--countdown-color) var(--intercept-progress, 100%),
+    rgba(255, 255, 255, 0.08) 0
+  );
+  color: var(--countdown-color);
+}
+
+.intercept-window__countdown-ring::before {
+  position: absolute;
+  inset: 4px;
+  border-radius: inherit;
+  background: #111b18;
+  content: "";
+}
+
+.intercept-window__countdown-ring strong {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.intercept-window__countdown-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.intercept-window__countdown-copy strong {
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.intercept-window__countdown-copy > span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 .intercept-window__section-title {
   margin-top: 22px;
   margin-bottom: 10px;

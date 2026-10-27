@@ -22,6 +22,7 @@ import { $, openDialog } from "../core/dom.js";
 import { escapeHtml } from "../core/utils.js";
 import {
   appendRoundHistory,
+  updateSpyStreaks,
   clearRoundHistory as clearRoundHistoryStorage
 } from "../core/storage.js";
 
@@ -227,6 +228,14 @@ function humanizeRoundEvent(evt) {
             : "")
       };
 
+    case "intercept_timeout":
+      return {
+        icon: "⏱",
+        text:
+          "Перехват провален: " + esc(d.player || "—") +
+          " не выбрал локацию за 15 секунд и выбывает"
+      };
+
 
     // PATCH 0.7.0 — Верификатор.
     case "verificator_used":
@@ -331,6 +340,7 @@ export function recordRound(options) {
         player: String(r?.player || ""),
         location: String(r?.location || ""),
         success: Boolean(r?.success),
+        reason: String(r?.reason || ""),
         priorFailures: Number(r?.priorFailures) || 0,
         reward: Number(r?.reward) || 0
       }))
@@ -373,6 +383,7 @@ export function recordRound(options) {
   };
 
   appendRoundHistory(entry);
+  updateSpyStreaks(state.assignments);
 
   return entry;
 }
