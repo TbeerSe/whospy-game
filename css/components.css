@@ -25,7 +25,7 @@
   margin-bottom: 8px;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -264,7 +264,7 @@
 }
 
 .button--small {
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .button--large {
@@ -321,6 +321,7 @@
 .modal {
   width: min(calc(100% - 28px), 620px);
   max-height: min(90vh, 760px);
+  max-height: min(90dvh, 760px);
   padding: 0;
   color: var(--color-text);
   border: 1px solid var(--color-border-strong);
@@ -341,6 +342,7 @@
 
 .modal__content {
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
   padding: 22px;
 }
@@ -445,6 +447,7 @@
 .confirm-intercept-modal {
   width: min(calc(100% - 28px), 480px);
   max-height: min(90vh, 640px);
+  max-height: min(90dvh, 640px);
   padding: 0;
   color: var(--color-text);
   border: 1px solid var(--color-border-strong);
@@ -472,6 +475,7 @@
 .confirm-intercept-modal__content {
   position: relative;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
   padding: 26px;
 }
@@ -545,7 +549,7 @@
 .custom-pack-item__roles {
   margin-top: 3px;
   color: var(--color-text-dim);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .custom-pack-item__delete {
@@ -665,7 +669,7 @@
   border-radius: var(--radius-small);
   background: var(--color-primary-soft);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.03em;
 }
 
@@ -815,7 +819,7 @@
   margin-bottom: 4px;
   color: var(--color-danger);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.03em;
 }
 
@@ -844,7 +848,7 @@
 }
 
 .header-actions__label {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.02em;
 }
 
@@ -903,7 +907,7 @@
 .stat-round__date {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -912,7 +916,7 @@
   border: 1px solid transparent;
   border-radius: 999px;
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
   white-space: nowrap;
@@ -933,7 +937,7 @@
 .stat-round__meta {
   overflow: hidden;
   color: var(--color-text-dim);
-  font-size: 11px;
+  font-size: 12px;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -977,7 +981,7 @@
   border: 1px dashed rgba(141, 164, 154, 0.3);
   border-radius: 4px;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.05em;
   vertical-align: middle;
@@ -986,20 +990,20 @@
 .stat-player__role {
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
 .stat-player__gadgets {
   color: var(--color-text-dim);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
 .stat-player__delta {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1024,7 +1028,7 @@
 
 .stat-detail__line {
   color: var(--color-text-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
 }
 
@@ -1044,7 +1048,7 @@
   border-radius: var(--radius-small);
   background: var(--color-primary-soft);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -1122,7 +1126,7 @@
 .round-detail__label {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -1148,7 +1152,7 @@
   border-bottom: 1px dashed rgba(141, 164, 154, 0.18);
 
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1190,7 +1194,7 @@
 .round-detail__event-time {
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.03em;
   text-align: right;
@@ -1221,7 +1225,7 @@
   border-radius: var(--radius-small);
   background: rgba(255, 255, 255, 0.03);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .round-detail__arrow {

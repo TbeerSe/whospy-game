@@ -12,6 +12,7 @@
 .verificator-target-modal {
   width: min(calc(100% - 28px), 540px);
   max-height: min(90vh, 720px);
+  max-height: min(90dvh, 720px);
   padding: 0;
   overflow: hidden;
   color: var(--color-text);
@@ -40,6 +41,7 @@
 .verificator-target-modal__content {
   position: relative;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
   padding: 26px;
 }
@@ -48,7 +50,7 @@
   margin-bottom: 8px;
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -83,6 +85,7 @@
 .verificator-result-modal {
   width: min(calc(100% - 28px), 460px);
   max-height: min(90vh, 640px);
+  max-height: min(90dvh, 640px);
   padding: 0;
   overflow: hidden;
   color: var(--color-text);
@@ -105,6 +108,7 @@
 .verificator-result-modal__content {
   position: relative;
   max-height: 90vh;
+  max-height: 90dvh;
   overflow-y: auto;
   padding: 26px;
 }
@@ -125,7 +129,7 @@
   margin-bottom: 14px;
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -147,7 +151,7 @@
 .verificator-result__label {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -179,7 +183,7 @@
 .verificator-result__verdict-label {
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -202,7 +206,7 @@
   margin-top: 18px;
   color: var(--color-text-dim);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.05em;
   text-align: right;
 }

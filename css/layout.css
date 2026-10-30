@@ -10,9 +10,16 @@
 .app-shell {
   width: min(100% - 32px, 1180px);
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0 auto;
-  padding: 20px 0 36px;
+  padding:
+    calc(20px + env(safe-area-inset-top, 0px))
+    0
+    calc(36px + env(safe-area-inset-bottom, 0px));
   overflow-x: hidden;
+  /* clip не создаёт контейнер прокрутки, поэтому position: sticky
+     у вложенных элементов работает относительно экрана */
+  overflow-x: clip;
 }
 
 .app-header {
@@ -62,7 +69,7 @@
 .panel__eyebrow {
   color: var(--color-primary);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -85,7 +92,7 @@
 
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   white-space: nowrap;

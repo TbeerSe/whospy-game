@@ -24,7 +24,7 @@
 
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.08em;
 }
 
@@ -106,7 +106,7 @@
   background: var(--color-primary-soft);
 
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1.3;
@@ -136,6 +136,7 @@
   min-height: 340px;
   padding: 24px 20px;
   overflow: hidden;
+  overflow: clip;
   border-color: rgba(255, 154, 74, 0.36);
   background:
     linear-gradient(
@@ -148,7 +149,7 @@
 
 .role-card__stamp {
   position: absolute;
-  top: 17px;
+  top: 12px;
   right: -29px;
   padding: 5px 34px;
 
@@ -157,14 +158,14 @@
   transform: rotate(32deg);
 
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 9px; /* декоративный штамп, не текст для чтения */
   letter-spacing: 0.08em;
 }
 
 .role-card__label {
   color: var(--color-orange);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.14em;
 }
@@ -215,7 +216,7 @@
 .role-card__warning {
   margin-bottom: 18px;
   color: var(--color-orange);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* ---------------------------------------------------------
@@ -262,7 +263,7 @@
   margin: 9px 0 16px;
   color: var(--color-text-dim);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
   text-align: center;
 }
 
@@ -309,6 +310,47 @@
 
 .radar-location-list span:nth-child(6) {
   animation-delay: 225ms;
+}
+
+/* ---------------------------------------------------------
+   Показ роли: карточка получателя прячется, роль идёт сразу
+   под индикатором хода, а «Скрыть карту» закреплена внизу
+   экрана, чтобы её не приходилось искать прокруткой.
+--------------------------------------------------------- */
+
+#dealing-screen:has(#role-card:not(.is-hidden)) .player-turn-card,
+#dealing-screen:has(#role-card:not(.is-hidden)) .screen-heading,
+#dealing-screen:has(#role-card:not(.is-hidden)) .dealing-footer {
+  display: none;
+}
+
+#role-card:not(.is-hidden) #hide-role {
+  position: sticky;
+  z-index: 5;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  box-shadow: 0 0 0 6px rgba(7, 16, 14, 0.92);
+}
+
+@media (max-height: 700px) {
+  .role-card {
+    min-height: 0;
+    padding: 16px 16px 14px;
+  }
+
+  .role-card__content {
+    margin: 14px 0;
+  }
+
+  .role-card__icon {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 8px;
+    font-size: 20px;
+  }
+
+  .role-card__warning {
+    margin-bottom: 12px;
+  }
 }
 
 } /* @layer features */

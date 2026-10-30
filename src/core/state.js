@@ -252,7 +252,6 @@ export const state = {
   partialCatches: [],
 
   // Снимки перед стартом раунда — для отмены без последствий.
-  balancesBeforeRound: null,
   gadgetsBeforeRound: null,
 
   // Защита ввода кода от перебора.

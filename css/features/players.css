@@ -48,7 +48,7 @@
   background: var(--color-primary-soft);
 
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .player-item__remove {
@@ -119,7 +119,7 @@
 .field-hint {
   margin-top: 8px;
   color: var(--color-text-dim);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.45;
 }
 
@@ -167,7 +167,7 @@
 .player-item__balance {
   color: var(--color-orange);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -186,7 +186,7 @@
   background: rgba(255, 255, 255, 0.035);
 
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1.4;
@@ -219,7 +219,7 @@
   margin-left: 2px;
   color: var(--color-text-dim);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.03em;
 }

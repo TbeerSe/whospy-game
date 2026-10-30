@@ -307,6 +307,54 @@ export function togglePauseTimer() {
   saveRoundSnapshot();
 }
 
+/* ---------- Автопауза на время перехвата ----------
+   Пока шпион выбирает локацию, общий таймер стоит. Если игроки уже
+   поставили паузу вручную, мы её не трогаем и не снимаем. */
+let suspendedByIntercept = false;
+
+export function suspendTimerForIntercept() {
+  if (state.gameEnded || state.timerPaused || suspendedByIntercept) return;
+  if (state.timerDeadline === null) return;
+
+  const remaining = getRemainingSeconds();
+  if (remaining <= 0) return;
+
+  state.timerPausedRemainingMs = Math.max(
+    0,
+    state.timerDeadline - Date.now()
+  );
+  state.timerPaused = true;
+  state.timerRemainingSeconds = remaining;
+  suspendedByIntercept = true;
+
+  pushRoundEvent("timer_paused", { remaining, reason: "intercept" });
+  setPauseButton(true);
+  saveRoundSnapshot();
+}
+
+export function resumeTimerAfterIntercept() {
+  if (!suspendedByIntercept) return;
+  suspendedByIntercept = false;
+
+  if (state.gameEnded || !state.timerPaused) return;
+
+  const rest =
+    state.timerPausedRemainingMs !== null
+      ? state.timerPausedRemainingMs
+      : state.timerRemainingSeconds * 1000;
+
+  state.timerDeadline = Date.now() + rest;
+  state.timerPausedRemainingMs = null;
+  state.timerPaused = false;
+
+  pushRoundEvent("timer_resumed", {
+    remaining: state.timerRemainingSeconds,
+    reason: "intercept"
+  });
+  setPauseButton(false);
+  saveRoundSnapshot();
+}
+
 /* Вкладка вернулась из фона — сразу догоняем реальное время. */
 if (typeof document !== "undefined") {
   document.addEventListener("visibilitychange", () => {

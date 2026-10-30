@@ -153,7 +153,7 @@ function check(name, condition, details) {
   check("окно перехвата закрыто", !result.modalOpen, result);
   check("ошибок страницы нет", errors.length === 0, errors);
 
-  console.log("3. Общий таймер истекает в открытом окне перехвата");
+  console.log("3. Общий таймер стоит, пока открыто окно перехвата");
   await page.evaluate(() => localStorage.clear());
   await page.reload();
   await page.waitForSelector("#settings-screen.is-active");
@@ -166,39 +166,34 @@ function check(name, condition, details) {
   );
   await page.click("#start-timer");
   await page.waitForSelector("#game-screen.is-active");
+
+  // До конца раунда остаётся ~1,5 с: без паузы таймер истёк бы в окне.
+  await page.evaluate(async () => {
+    const { state } = await import("/src/core/state.js");
+    state.timerDeadline = Date.now() + 1500;
+    state.timerRemainingSeconds = 2;
+  });
   await page.$eval("#open-intercept-window", (button) => button.click());
   await H.typeCode(page, lastSecondSpy.code);
   await page.waitForSelector("#intercept-window-modal[open]");
+  await page.waitForTimeout(2500);
 
-  // Сокращаем только дедлайн раунда: сам перехват открыт через реальный UI.
-  await page.evaluate(async () => {
-    const { state } = await import("/src/core/state.js");
-    state.timerDeadline = Date.now() + 1200;
-    state.timerRemainingSeconds = 2;
-  });
-  await page.waitForSelector("#game-result:not(.is-hidden)", { timeout: 10000 });
-
-  const mainTimerResult = await page.evaluate(async () => {
+  const during = await page.evaluate(async () => {
     const { state } = await import("/src/core/state.js");
     return {
-      outcome: state.gameOutcome,
-      reason: state.interceptResults[0]?.reason,
-      modalOpen: Boolean(document.querySelector("#intercept-window-modal[open]")),
-      excluded: state.assignments.find((a) => a.roleType === "spy").excluded
+      ended: state.gameEnded,
+      paused: state.timerPaused,
+      modalOpen: Boolean(document.querySelector("#intercept-window-modal[open]"))
     };
   });
-  check(
-    "ожидание в окне не даёт победу по общему таймеру",
-    mainTimerResult.outcome === "all-spies-failed" && mainTimerResult.outcome !== "timeout",
-    mainTimerResult
-  );
-  check(
-    "общий таймер засчитывает перехват как просроченный",
-    mainTimerResult.reason === "timeout" && mainTimerResult.excluded,
-    mainTimerResult
-  );
-  check("окно закрывается при истечении общего таймера", !mainTimerResult.modalOpen, mainTimerResult);
-  check("ошибок страницы после обоих сценариев нет", errors.length === 0, errors);
+  check("общий таймер не завершил раунд в окне", !during.ended && during.paused && during.modalOpen, during);
+
+  const realLocation = await H.stateOf(page, "state.currentRoundLocation");
+  await page.$eval(`[data-intercept-location="${realLocation}"]`, (b) => b.click());
+  await page.$eval("[data-intercept-confirm]", (b) => b.click());
+  await page.waitForSelector("#game-result:not(.is-hidden)", { timeout: 10000 });
+  check("итог — перехват, а не время", (await H.stateOf(page, "state.gameOutcome")) === "spy-location-success");
+  check("ошибок страницы нет", errors.length === 0, errors);
 
   await browser.close();
   console.log(failed ? `\n${failed} FAILED` : "\nALL PASSED");

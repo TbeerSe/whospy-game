@@ -11,6 +11,7 @@
 .screen--audit {
   display: grid;
   min-height: calc(100vh - 130px);
+  min-height: calc(100dvh - 130px);
   place-items: center;
 }
 
@@ -65,14 +66,14 @@
 
 .audit-window__title {
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.08em;
 }
 
 .audit-window__status {
   margin-left: auto;
   color: var(--color-primary);
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.1em;
 }
 

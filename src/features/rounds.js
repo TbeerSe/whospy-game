@@ -325,13 +325,6 @@ function getResultText(outcome) {
     };
   }
 
-  if (outcome === "spy-location-failure") {
-    return {
-      title: "МИРНЫЕ ПОБЕДИЛИ",
-      description: "Шпион ошибся при перехвате локации."
-    };
-  }
-
   if (outcome === "shutdown") {
     return {
       title: "ШПИОН ПОБЕДИЛ",
@@ -361,25 +354,10 @@ async function revealAllRolesAtEnd(outcome = "timeout") {
 
   const resultText = getResultText(outcome);
 
-  const totalPlayers = state.assignments.length;
-  const totalSpies = state.assignments.filter(
-    (assignment) => assignment.roleType === "spy"
-  ).length;
-
-  const isRealParanoia = totalPlayers > 0 && totalSpies === totalPlayers;
-
-  if (isRealParanoia) {
-    resultTitle.textContent = "🚨 РЕЖИМ «ПАРАНОЙЯ»";
-    resultDesc.textContent =
-      "Абсолютный хаос! В этой операции не было мирных жителей.";
-  } else {
-    resultTitle.textContent = resultText.title;
-    resultDesc.textContent =
-      resultText.description +
-      (state.lastPot > 0
-        ? ` Банк раунда: ${state.lastPot} 🪙.`
-        : "");
-  }
+  resultTitle.textContent = resultText.title;
+  resultDesc.textContent =
+    resultText.description +
+    (state.lastPot > 0 ? ` Банк раунда: ${state.lastPot} 🪙.` : "");
 
   let rolesListContainer = $("#end-roles-list");
 
@@ -586,7 +564,6 @@ export function resetGame(options = {}) {
   state.partialCatches = [];
   state.roundSettled = false;
   state.lastPot = 0;
-  state.balancesBeforeRound = null;
   state.gadgetsBeforeRound = null;
   state.timerDeadline = null;
   state.timerPausedRemainingMs = null;

@@ -153,7 +153,7 @@
   }
 
   .brand__eyebrow {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 0.1em;
   }
 
@@ -164,12 +164,12 @@
 
   .header-actions .button {
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: 12px;
     min-height: 32px;
   }
 
   .header-status {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .sound-toggle {
@@ -215,7 +215,7 @@
 
   .header-actions .button {
     padding: 5px 8px;
-    font-size: 11px;
+    font-size: 12px;
     min-height: 32px;
   }
 
@@ -354,11 +354,11 @@
   }
 
   .location-card__name {
-    font-size: 11px;
+    font-size: 12px;
   }
 
   .location-card__roles {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .audit-window__content {
@@ -367,7 +367,7 @@
   }
 
   .audit-log {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .role-card__stamp {
@@ -392,11 +392,11 @@
   }
 
   .player-item__balance {
-    font-size: 9px;
+    font-size: 12px;
   }
 
   .player-item__rank {
-    font-size: 8px;
+    font-size: 12px;
     padding: 2px 6px;
   }
 

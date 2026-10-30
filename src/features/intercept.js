@@ -28,6 +28,10 @@ import {
   getActiveCounts
 } from "./rounds.js";
 import { saveRoundSnapshot } from "./roundStore.js";
+import {
+  suspendTimerForIntercept,
+  resumeTimerAfterIntercept
+} from "./timer.js";
 
 /* =========================================================
    Колбэк окончания перехвата
@@ -53,6 +57,7 @@ let interceptCountdownInterval = null;
 let interceptCountdownDeadline = 0;
 let interceptCountdownPlayer = "";
 let interceptLastSecond = null;
+let interceptCountdownTotal = INTERCEPT_WINDOW_SECONDS;
 
 function stopInterceptCountdown() {
   if (interceptCountdownInterval !== null) {
@@ -63,6 +68,9 @@ function stopInterceptCountdown() {
   interceptCountdownDeadline = 0;
   interceptCountdownPlayer = "";
   interceptLastSecond = null;
+
+  // Отсчёт закончился (выбор, провал или закрытие окна): общий таймер идёт дальше.
+  resumeTimerAfterIntercept();
 }
 
 function renderInterceptCountdown(modal) {
@@ -84,7 +92,7 @@ function renderInterceptCountdown(modal) {
     const ring = modal.querySelector("[data-intercept-countdown]");
     const progress = Math.max(
       0,
-      Math.min(100, (remaining / INTERCEPT_WINDOW_SECONDS) * 100)
+      Math.min(100, (remaining / interceptCountdownTotal) * 100)
     );
 
     if (value) value.textContent = String(remaining).padStart(2, "0");
@@ -105,10 +113,18 @@ function renderInterceptCountdown(modal) {
   }
 }
 
-function startInterceptCountdown(modal, player) {
+function startInterceptCountdown(
+  modal,
+  player,
+  seconds = INTERCEPT_WINDOW_SECONDS
+) {
   stopInterceptCountdown();
   interceptCountdownPlayer = player;
-  interceptCountdownDeadline = Date.now() + INTERCEPT_WINDOW_SECONDS * 1000;
+  interceptCountdownTotal = seconds;
+  interceptCountdownDeadline = Date.now() + seconds * 1000;
+
+  // Пока идёт выбор локации, общий таймер раунда стоит.
+  suspendTimerForIntercept();
   renderInterceptCountdown(modal);
   interceptCountdownInterval = window.setInterval(
     () => renderInterceptCountdown(modal),
@@ -205,14 +221,71 @@ export async function openInterceptWindow() {
   const modal = createInterceptWindowModal();
 
   resetInterceptModal(modal, assignment.player);
+  setInterceptModalMode(modal, {
+    fakeId: false,
+    seconds: INTERCEPT_WINDOW_SECONDS
+  });
 
   openDialog(modal);
   startInterceptCountdown(modal, assignment.player);
 }
 
 /* =========================================================
+   Перехват после фальшивого удостоверения
+   Код вводить не нужно: окно открывается само, только для
+   спасённого шпиона, на 10 секунд. Общий таймер на паузе.
+========================================================= */
+
+export const FAKE_ID_INTERCEPT_SECONDS = 10;
+
+export function startFakeIdIntercept(player) {
+  if (state.gameEnded || !isInterceptAvailable(player)) return false;
+
+  const modal = createInterceptWindowModal();
+
+  resetInterceptModal(modal, player);
+  setInterceptModalMode(modal, {
+    fakeId: true,
+    seconds: FAKE_ID_INTERCEPT_SECONDS
+  });
+
+  openDialog(modal);
+  startInterceptCountdown(modal, player, FAKE_ID_INTERCEPT_SECONDS);
+  return true;
+}
+
+/* =========================================================
    Шаг 2: выбор локации
 ========================================================= */
+
+function setInterceptModalMode(modal, { fakeId, seconds }) {
+  const set = (selector, text) => {
+    const node = modal.querySelector(selector);
+    if (node) node.textContent = text;
+  };
+
+  set(
+    ".intercept-window-modal__title",
+    fakeId ? "Шпион, выбирайте локацию" : "Код принят"
+  );
+
+  set(
+    ".intercept-window__hint",
+    fakeId
+      ? "Фальшивое удостоверение сработало. Шпион берёт телефон и " +
+        "выбирает локацию. Выбор увидят все, кто смотрит на экран."
+      : "Выберите локацию, которую считаете настоящей. " +
+        "Выбор увидят все, кто смотрит на экран."
+  );
+
+  set(
+    ".intercept-window__countdown-copy strong",
+    `Решение за ${seconds} секунд`
+  );
+
+  const value = modal.querySelector("[data-intercept-countdown-value]");
+  if (value) value.textContent = String(seconds).padStart(2, "0");
+}
 
 function resetInterceptModal(modal, player) {
   modal.dataset.selectedPlayer = player;
@@ -296,7 +369,7 @@ function createInterceptWindowModal() {
         </span>
         <span class="intercept-window__countdown-copy">
           <strong>Решение за 15 секунд</strong>
-          <span>Не успеете подтвердить — перехват провален.</span>
+          <span>Не успеете подтвердить или закроете окно — перехват провален.</span>
         </span>
       </div>
 
@@ -307,7 +380,7 @@ function createInterceptWindowModal() {
       <div class="intercept-window__locations judging-location-list"></div>
 
       <p class="intercept-window__warning">
-        Выбор финален. Ошибка или истечение времени — выбывание из раунда.
+        Выбор финален. Ошибка, истечение времени или закрытие окна — выбывание из раунда.
       </p>
 
       <div class="intercept-window-modal__actions">
@@ -330,7 +403,22 @@ function createInterceptWindowModal() {
     event.preventDefault();
   });
 
-  modal.addEventListener("close", stopInterceptCountdown);
+  // Окно закрыто не нашими путями (системная «Назад» на Android,
+  // жест, программное закрытие): отсчёт ещё идёт. Считаем это
+  // провалом, иначе можно открыть окно заново и получить новые 15 секунд.
+  modal.addEventListener("close", () => {
+    const player = interceptCountdownPlayer;
+
+    if (!player || state.gameEnded) {
+      stopInterceptCountdown();
+      return;
+    }
+
+    stopInterceptCountdown();
+    modal.dataset.selectedPlayer = "";
+    modal.dataset.selectedLocation = "";
+    executeIntercept(player, null, { timedOut: true });
+  });
 
   modal.addEventListener("click", (event) => {
     const locationBtn = event.target.closest(
@@ -366,6 +454,7 @@ function createInterceptWindowModal() {
     modal.dataset.selectedPlayer = "";
     modal.dataset.selectedLocation = "";
 
+    stopInterceptCountdown();
     closeDialog(modal);
 
     executeIntercept(selectedPlayer, location);
@@ -449,7 +538,7 @@ function executeIntercept(player, location, options = {}) {
 
   showToast(
     timedOut
-      ? `${player} не уложился в 15 секунд и выбывает. Локация скрыта.`
+      ? `${player} не успел выбрать локацию или закрыл окно и выбывает. Локация скрыта.`
       : `${player} провалил перехват и выбывает. Локация скрыта.`
   );
 

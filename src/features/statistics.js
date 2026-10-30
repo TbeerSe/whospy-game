@@ -33,7 +33,7 @@ import {
 function getWinner(outcome) {
   if (
     outcome === "voting" ||
-    outcome === "spy-location-failure" ||
+    outcome === "spy-location-failure" || // старые записи истории
     outcome === "all-spies-failed"
   ) {
     return "civilians";

@@ -1006,9 +1006,6 @@ export async function startMission() {
     }
 
     // Снимки ДО активации предметов: нужны для отмены раунда.
-    state.balancesBeforeRound = JSON.parse(
-      JSON.stringify(state.balances)
-    );
     state.gadgetsBeforeRound = JSON.parse(
       JSON.stringify(state.gadgets)
     );

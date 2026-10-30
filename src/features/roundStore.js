@@ -86,7 +86,6 @@ export function buildRoundSnapshot() {
     currentRoundEvents: clone(state.currentRoundEvents),
     lastBalanceChanges: clone(state.lastBalanceChanges),
 
-    balancesBeforeRound: clone(state.balancesBeforeRound),
     gadgetsBeforeRound: clone(state.gadgetsBeforeRound),
     spiesAnnounced: Boolean(state.announceSpies),
 
@@ -197,7 +196,6 @@ export function applyRoundSnapshot(snap) {
     ? clone(snap.lastBalanceChanges)
     : null;
 
-  state.balancesBeforeRound = clone(snap.balancesBeforeRound);
   state.gadgetsBeforeRound = clone(snap.gadgetsBeforeRound);
   state.announceSpies = snap.spiesAnnounced !== false;
 

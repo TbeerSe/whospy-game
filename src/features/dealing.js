@@ -184,6 +184,9 @@ export function revealCurrentRole() {
   elements.revealRole.classList.add("is-hidden");
   elements.roleCard.classList.remove("is-hidden");
 
+  // Роль должна быть видна целиком, а не оказаться ниже экрана.
+  window.scrollTo({ top: 0, behavior: "auto" });
+
   // PATCH 0.6.3 — сбрасываем предупреждающий класс локации,
   // он может остаться от предыдущего игрока.
   elements.roleCardLocation.classList.remove(
@@ -362,6 +365,7 @@ export function hideCurrentRole() {
   state.roleVisible = false;
 
   elements.roleCard.classList.add("is-hidden");
+  window.scrollTo({ top: 0, behavior: "auto" });
 
   // BUG 2 (0.3.1): отдельный счётчик реально скрытых карт.
   state.revealedCount += 1;

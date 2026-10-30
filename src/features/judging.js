@@ -43,7 +43,8 @@ import {
 import {
   openInterceptWindow,
   getAvailableInterceptors,
-  isInterceptBlocked
+  isInterceptBlocked,
+  startFakeIdIntercept
 } from "./intercept.js";
 import { openVerificatorTargetModal } from "./verificator.js";
 
@@ -140,7 +141,7 @@ export function createJudgingInterface() {
       <div class="judging-accordion__body">
         <p class="judging-help">
           Нажмите кнопку и введите личный код с вашей карты роли.
-          Если у вас есть активированный Верификатор — выберете
+          Если у вас есть активированный Верификатор — выберите
           цель, результат увидят все. Иначе код не будет принят.
           После использования Верификатор сгорает.
         </p>
@@ -195,7 +196,34 @@ function renderSpyBadge() {
   badge.classList.remove("is-hidden");
 }
 
+/* Если во время голосования кто-то выбыл (например, подозреваемый
+   провалил перехват), голосование теряет смысл: сбрасываем его,
+   а выбывших голосующих убираем из набора. */
+function reconcileVotingWithExclusions() {
+  const { suspect, initiator } = state.voting;
+  if (!suspect && !initiator) return;
+
+  const isOut = (name) =>
+    state.assignments.some(
+      (item) => item.player === name && item.excluded
+    );
+
+  if ((suspect && isOut(suspect)) || (initiator && isOut(initiator))) {
+    pushRoundEvent("vote_cancelled_excluded", { suspect, initiator });
+    resetVotingState();
+    return;
+  }
+
+  for (const voter of Array.from(state.voting.voters)) {
+    if (isOut(voter)) {
+      state.voting.voters.delete(voter);
+      delete state.voting.committedVotes[voter];
+    }
+  }
+}
+
 export function renderJudgingInterface() {
+  reconcileVotingWithExclusions();
   renderSpyBadge();
 
   const container = $("#judging-interface");
@@ -609,7 +637,13 @@ function submitVote() {
   const activeCount = spies + civilians;
   const requiredVotes = Math.floor(activeCount / 2) + 1;
 
-  if (voters.size < requiredVotes) {
+  const activeVoters = Array.from(voters).filter((name) =>
+    state.assignments.some(
+      (item) => item.player === name && !item.excluded
+    )
+  );
+
+  if (activeVoters.length < requiredVotes) {
     playFailure();
 
     if (voteStatus) {
@@ -627,6 +661,14 @@ function submitVote() {
 
   if (!assignment) return;
 
+  if (assignment.excluded) {
+    playFailure();
+    showToast(`${suspect} уже выбыл — голосование отменено`);
+    resetVotingState();
+    renderJudgingInterface();
+    return;
+  }
+
   if (assignment.roleType === "spy") {
     // --- Фальшивое удостоверение ---
     const active = state.activeGadgets[suspect] || {};
@@ -642,7 +684,7 @@ function submitVote() {
       saveGadgets();
 
       playFailure();
-      showToast("Фальшивое удостоверение спасло подозреваемого");
+      showToast("Фальшивое удостоверение сработало. Шпион выбирает локацию");
 
       pushRoundEvent("vote_fake_id_used", {
         suspect,
@@ -655,6 +697,10 @@ function submitVote() {
         voteStatus.textContent =
           "Подозреваемый предъявил алиби. Операция продолжается.";
       }
+
+      // Шпион получает 10 секунд на перехват (код вводить не нужно),
+      // общий таймер на это время стоит.
+      startFakeIdIntercept(suspect);
 
       return;
     }
