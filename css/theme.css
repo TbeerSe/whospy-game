@@ -519,18 +519,15 @@ body {
     padding-bottom: 14px;
   }
 
-  .screen--settings {
-    padding-bottom: 86px;
-  }
-
+  /* Панель «Начать операцию» липнет к нижнему краю при прокрутке,
+     но остаётся в потоке страницы: в конце списка она стоит под
+     последним блоком и ничего не перекрывает. */
   .screen--settings .settings-actions {
-    position: fixed;
+    position: sticky;
     z-index: 15;
-    right: 12px;
-    bottom: max(10px, env(safe-area-inset-bottom));
-    left: 12px;
+    bottom: max(10px, env(safe-area-inset-bottom, 0px));
     display: grid;
-    margin: 0;
+    margin: 16px 0 0;
     padding: 8px;
     border-radius: 15px;
   }
